@@ -1,5 +1,6 @@
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_image.h>
+#include <iostream>
 #include <vector>
 #include "uberengine.h"
 
@@ -28,9 +29,9 @@ void GameObject::createSurface(int x, int y, int w, int h, Uint32 c) {
     rect = surface->clip_rect;
     rect.x = x;
     rect.y = y;
-    texture = SDL_CreateTextureFromSurface(renderer, surface);
-    SDL_FreeSurface(surface);
     SDL_FillRect(surface, NULL, c);
+    texture = SDL_CreateTextureFromSurface(renderer, surface);
+    SDL_FreeSurface(surface); 
 }
 
 void GameObject::createSurface(int x, int y, const char img[]) {
@@ -46,7 +47,9 @@ void GameObject::start() {}
 
 void GameObject::update() {}
 
-void GameObject::draw() {}
+void GameObject::draw() {
+    SDL_RenderCopy(renderer, texture, NULL, &rect);
+}
 
 
 ObjectGroup::ObjectGroup() {}
@@ -65,6 +68,18 @@ void ObjectGroup::remove(GameObject g) {
         }
 }
 
+void ObjectGroup::update() {
+    for (int i = 0; i < gameObjectSize; i++) {
+        gameObjects[i]->update();
+    }
+}
+
+void ObjectGroup::draw() {
+    for (int i = 0; i < gameObjectSize; i++) {
+        gameObjects[i]->draw();
+    }
+}
+
 
 GameManager::GameManager() {
     quit = false;
@@ -72,7 +87,6 @@ GameManager::GameManager() {
     window = SDL_CreateWindow("uberengine", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, 1366, 768, SDL_WINDOW_FULLSCREEN_DESKTOP);
     renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED);
     screen = SDL_GetWindowSurface(window);
-    start();
 }
 
 GameManager::GameManager(int x, int y) {
@@ -81,10 +95,7 @@ GameManager::GameManager(int x, int y) {
     window = SDL_CreateWindow("uberengine", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, x, y, SDL_WINDOW_FULLSCREEN_DESKTOP);
     renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED);
     screen = SDL_GetWindowSurface(window);
-    start();
 }
-
-void GameManager::start() {}
 
 void GameManager::events() {
     while (SDL_PollEvent(&event) != 0) {

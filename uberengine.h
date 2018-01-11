@@ -32,6 +32,8 @@ class ObjectGroup {
         int gameObjectSize;
         void add(GameObject *g);
         void remove(GameObject g);
+        void update();
+        void draw();
 };
 
 
@@ -39,17 +41,18 @@ class GameManager {
     public:
         GameManager();
         GameManager(int x, int y);
-        virtual void start();
         virtual void events();
         virtual void update();
         virtual void draw();
         void capFps();
         void loop();
     
-    private:
+    protected:
         SDL_Window *window;
         SDL_Renderer *renderer;
         SDL_Surface *screen;
+
+    private: 
         Uint32 startTick;
         SDL_Event event;
         bool quit;
