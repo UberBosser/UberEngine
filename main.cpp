@@ -4,6 +4,7 @@
 #include <SDL2/SDL_image.h>
 #include "uberengine.h"
 
+
 class Player : public GameObject {
     public:
         Player(int x, int y, Uint32 c, SDL_Renderer *r) : GameObject(r){
@@ -13,10 +14,10 @@ class Player : public GameObject {
         virtual void update() {
             const Uint8 *keys = SDL_GetKeyboardState(NULL);
             if (keys[SDL_SCANCODE_LEFT]) {
-                rect.x += -1;
+                rect.x += -3;
             }
             if (keys[SDL_SCANCODE_RIGHT]) {
-                rect.x += 1;
+                rect.x += 3;
             }
         }
 };

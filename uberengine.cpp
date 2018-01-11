@@ -48,7 +48,7 @@ void GameObject::start() {}
 void GameObject::update() {}
 
 void GameObject::draw() {
-    SDL_RenderCopy(renderer, texture, NULL, &rect);
+    SDL_RenderCopyEx(renderer, texture, NULL, &rect, angle, &pivot, flip);
 }
 
 
@@ -61,11 +61,11 @@ void ObjectGroup::add(GameObject *g) {
 
 void ObjectGroup::remove(GameObject g) {
     for (int i = 0; i < gameObjectSize; i++) {
-            if (*gameObjects[i] == g) {
-                gameObjects.erase(gameObjects.begin() + i);
-                gameObjectSize = gameObjects.size();
-            }
+        if (*gameObjects[i] == g) {
+            gameObjects.erase(gameObjects.begin() + i);
+            gameObjectSize = gameObjects.size();
         }
+    }
 }
 
 void ObjectGroup::update() {

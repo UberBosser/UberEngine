@@ -8,6 +8,9 @@
 class GameObject {
     public:
         SDL_Rect rect;
+        double angle;
+        SDL_Point pivot;
+        SDL_RendererFlip flip;
         GameObject();
         GameObject(SDL_Renderer *r);
         bool operator== (const GameObject &gameObject) const;
