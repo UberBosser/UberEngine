@@ -36,24 +36,24 @@ class Text : public TextObject {
 
 class Game : public GameManager {
     public:
-        Game() : GameManager(){
+        Game() {
             camera = new GameCamera(getScreenWidth(), getScreenHeight());
-            group.add(new Player(renderer, 50, 50, "Assets/player.png")); 
-            group.add(new Text(renderer, 200, 100, "Ceci n'est pas un test.", 42, "Assets/Roboto.ttf"));
-            camera->setTarget(group.gameObjects[0]);
-            group.add(camera);
+            camera->addChild(new Player(renderer, 50, 50, "Assets/player.png")); 
+            camera->addChild(new Text(renderer, 200, 100, "Ceci n'est pas un test.", 42, "Assets/Roboto.ttf"));
+            camera->setTarget(camera->getChild(0));
         }
 
         virtual void update() {
-            group.update();
+            camera->update();
+            camera->updateChildren();
         }
 
         virtual void draw() {
-            group.draw(camera->getPosX(), camera->getPosY());
+            camera->draw(camera->getPosX(), camera->getPosY());
+            camera->drawChildren(camera->getPosX(), camera->getPosY());
         }
 
     private:
-        ObjectGroup group;
         GameCamera *camera;
 };
 

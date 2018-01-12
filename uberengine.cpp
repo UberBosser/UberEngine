@@ -42,15 +42,69 @@ int GameObject::getHeight() {
     return rect.h;
 }
 
+SDL_Renderer* GameObject::getRenderer() {
+    return renderer;
+}
+
+void GameObject::addChild(GameObject *g) {
+    children.push_back(g);
+    childrenSize = children.size();
+}
+
+void GameObject::removeChild(GameObject *g) {
+    for (int i = 0; i < childrenSize; i++) {
+        if (*children[i] == g) {
+            children.erase(children.begin() + i);
+            childrenSize = children.size();
+        }
+    }
+}
+
+GameObject* GameObject::getChild(int i) {
+    return children[i];
+}
+
 void GameObject::update() {}
+
+void GameObject::updateChildren() {
+    for (int i = 0; i < childrenSize; i++) {
+        children[i]->update();
+        if (!children[i]->children.empty()) {
+            children[i]->update();
+        }
+    }
+}
 
 void GameObject::draw() {}
 
 void GameObject::draw(int offsetX, int offsetY) {}
 
+void GameObject::drawChildren() {
+    for (int i = 0; i < childrenSize; i++) {
+        children[i]->draw();
+        if (!children[i]->children.empty()) {
+            children[i]->drawChildren(); 
+        } 
+    }
+}
+
+void GameObject::drawChildren(int offsetX, int offsetY) {
+    for (int i = 0; i < childrenSize; i++) {
+        children[i]->draw(offsetX, offsetY);
+        if (!children[i]->children.empty()) {
+            children[i]->drawChildren(offsetX, offsetY); 
+        }
+    }
+}
+
 
 SpriteObject::SpriteObject(SDL_Renderer *r) {
     renderer = r;
+}
+
+SpriteObject::SpriteObject(GameObject *p) {
+    parent = p;
+    renderer = parent->getRenderer();
 }
 
 void SpriteObject::createSurface(int x, int y, int w, int h) {
@@ -102,6 +156,14 @@ void SpriteObject::draw(int offsetX, int offsetY) {
 
 TextObject::TextObject(SDL_Renderer *r) {
     renderer = r;
+    color.r = 255;
+    color.g = 255;
+    color.b = 255;
+}
+
+TextObject::TextObject(GameObject *p) {
+    parent = p;
+    renderer = parent->getRenderer();
     color.r = 255;
     color.g = 255;
     color.b = 255;
@@ -226,6 +288,10 @@ int GameManager::getScreenWidth() {
 
 int GameManager::getScreenHeight() {
     return screenHeight;
+}
+
+SDL_Renderer* GameManager::getRenderer() {
+    return renderer;
 }
 
 void GameManager::events() {

@@ -17,24 +17,41 @@ class GameObject {
         int getWidth();
         int getHeight();
 
+        SDL_Renderer* getRenderer();
+
+        void addChild(GameObject *g);
+        void removeChild(GameObject *g);
+        GameObject* getChild(int i);
+        bool hasChildren();
+
         virtual void update();
+        virtual void updateChildren();
         virtual void draw();
         virtual void draw(int offsetX, int offsetY);
+        virtual void drawChildren();
+        virtual void drawChildren(int offsetX, int offsetY);
 
     protected:
         SDL_Renderer *renderer;
         SDL_Surface *surface;
         SDL_Texture *texture; 
+
         double angle;
         SDL_Point pivot;
         SDL_Rect rect;  
         SDL_RendererFlip flip;
+        
+        GameObject *parent;
+
+        std::vector <GameObject*> children;
+        int childrenSize;
 };
 
 
 class SpriteObject : public GameObject {
     public:
-        SpriteObject(SDL_Renderer *r); 
+        SpriteObject(SDL_Renderer *r);
+        SpriteObject(GameObject *p); 
 
         void createSurface(int x, int y, int w, int h);
         void createSurface(int x, int y, int w, int h, Uint32 c);
@@ -48,7 +65,8 @@ class SpriteObject : public GameObject {
 
 class TextObject : public GameObject {
     public:
-        TextObject(SDL_Renderer *r); 
+        TextObject(SDL_Renderer *r);
+        TextObject(GameObject *p);
 
         void createSurface(int x, int y, const char *t, int s, const char *f);
 
@@ -100,6 +118,7 @@ class GameManager {
 
         int getScreenWidth();
         int getScreenHeight();
+        SDL_Renderer* getRenderer();
 
         virtual void events();
         virtual void update();
