@@ -71,6 +71,10 @@ class GameManager {
     public:
         GameManager();
         GameManager(int x, int y);
+        
+        void changeIcon(const char *f);
+        void changeTitle(const char *t);
+
         virtual void events();
         virtual void update();
         virtual void draw();
