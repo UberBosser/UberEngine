@@ -131,7 +131,7 @@ GameManager::GameManager() {
     window = SDL_CreateWindow("uberengine", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, 1366, 768, SDL_WINDOW_FULLSCREEN_DESKTOP);
     renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED);
     screen = SDL_GetWindowSurface(window);
-    changeIcon("Assets/icon.png");
+    SDL_SetWindowIcon(window, IMG_Load("Assets/icon.png"));
 }
 
 GameManager::GameManager(int x, int y) {
@@ -141,15 +141,7 @@ GameManager::GameManager(int x, int y) {
     window = SDL_CreateWindow("uberengine", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, x, y, SDL_WINDOW_FULLSCREEN_DESKTOP);
     renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED);
     screen = SDL_GetWindowSurface(window);
-    changeIcon("Assets/icon.png");
-}
-
-void GameManager::changeIcon(const char *f) {
-    SDL_SetWindowIcon(window, IMG_Load(f));
-}
-
-void GameManager::changeTitle(const char *t) {
-    SDL_SetWindowTitle(window, t);
+    SDL_SetWindowIcon(window, IMG_Load("Assets/icon.png")); 
 }
 
 void GameManager::events() {
