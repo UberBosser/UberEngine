@@ -98,19 +98,6 @@ class GameCamera : public GameObject {
 };
 
 
-class ObjectGroup {
-    public:
-        ObjectGroup();
-        std::vector <GameObject*> gameObjects;
-        int gameObjectSize;
-        void add(GameObject *g);
-        void remove(GameObject *g);
-        void update();
-        void draw();
-        void draw(int offsetX, int offsetY);
-};
-
-
 class GameManager {
     public:
         GameManager();

@@ -223,41 +223,6 @@ void GameCamera::update() {
 }
 
 
-ObjectGroup::ObjectGroup() {}
-
-void ObjectGroup::add(GameObject *g) {
-    gameObjects.push_back(g);
-    gameObjectSize = gameObjects.size();
-}
-
-void ObjectGroup::remove(GameObject *g) {
-    for (int i = 0; i < gameObjectSize; i++) {
-        if (*gameObjects[i] == g) {
-            gameObjects.erase(gameObjects.begin() + i);
-            gameObjectSize = gameObjects.size();
-        }
-    }
-}
-
-void ObjectGroup::update() {
-    for (int i = 0; i < gameObjectSize; i++) {
-        gameObjects[i]->update();
-    }
-}
-
-void ObjectGroup::draw() {
-    for (int i = 0; i < gameObjectSize; i++) {
-        gameObjects[i]->draw();
-    }
-}
-
-void ObjectGroup::draw(int offsetX, int offsetY) {
-    for (int i = 0; i < gameObjectSize; i++) {
-        gameObjects[i]->draw(offsetX, offsetY);
-    }
-}
-
-
 GameManager::GameManager() {
     quit = false;
     SDL_Init(SDL_INIT_EVERYTHING);
