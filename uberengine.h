@@ -19,7 +19,7 @@ class GameObject {
 
         virtual void update();
         virtual void draw();
-        virtual void draw(int cameraX, int cameraY);
+        virtual void draw(int offsetX, int offsetY);
 
     protected:
         SDL_Renderer *renderer;
@@ -42,7 +42,7 @@ class SpriteObject : public GameObject {
 
         virtual void update();
         virtual void draw();
-        virtual void draw(int cameraX, int cameraY);
+        virtual void draw(int offsetX, int offsetY);
 };
 
 
@@ -56,7 +56,7 @@ class TextObject : public GameObject {
 
         virtual void update();
         virtual void draw();
-        virtual void draw(int cameraX, int cameraY);
+        virtual void draw(int offsetX, int offsetY);
 
     private:
         TTF_Font *font;
@@ -71,6 +71,7 @@ class GameCamera : public GameObject {
        GameCamera(int w, int h);
 
        void setTarget(GameObject *gameObject);
+       void setSize(int w, int h);
 
        virtual void update();
 
@@ -88,7 +89,7 @@ class ObjectGroup {
         void remove(GameObject *g);
         void update();
         void draw();
-        void draw(int cameraX, int cameraY);
+        void draw(int offsetX, int offsetY);
 };
 
 

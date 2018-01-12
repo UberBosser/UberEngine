@@ -46,7 +46,7 @@ void GameObject::update() {}
 
 void GameObject::draw() {}
 
-void GameObject::draw(int cameraX, int cameraY) {}
+void GameObject::draw(int offsetX, int offsetY) {}
 
 
 SpriteObject::SpriteObject(SDL_Renderer *r) {
@@ -93,9 +93,9 @@ void SpriteObject::draw() {
     SDL_RenderCopyEx(renderer, texture, NULL, &rect, angle, &pivot, flip);
 }
 
-void SpriteObject::draw(int cameraX, int cameraY) {
-    rect.x -= cameraX;
-    rect.y -= cameraY;
+void SpriteObject::draw(int offsetX, int offsetY) {
+    rect.x -= offsetX;
+    rect.y -= offsetY;
     SDL_RenderCopyEx(renderer, texture, NULL, &rect, angle, &pivot, flip);
 }
 
@@ -134,11 +134,12 @@ void TextObject::draw() {
     SDL_RenderCopyEx(renderer, texture, NULL, &rect, angle, &pivot, flip);
 }
 
-void TextObject::draw(int cameraX, int cameraY) {
-    rect.x -= cameraX;
-    rect.y -= cameraY;
+void TextObject::draw(int offsetX, int offsetY) {
+    rect.x -= offsetX;
+    rect.y -= offsetY;
     SDL_RenderCopyEx(renderer, texture, NULL, &rect, angle, &pivot, flip);
 }
+
 
 GameCamera::GameCamera(int w, int h) {
     rect.w = w;
@@ -149,12 +150,15 @@ void GameCamera::setTarget(GameObject *gameObject) {
     target = gameObject;
 }
 
+void GameCamera::setSize(int w, int h) {
+    rect.w = w;
+    rect.h = h;
+}
+
 void GameCamera::update() {
     rect.x = (target->getPosX() + target->getWidth()/2) - rect.w/2;
     rect.y = (target->getPosY() + target->getHeight()/2) - rect.h/2; 
 }
-
-
 
 
 ObjectGroup::ObjectGroup() {}
@@ -185,9 +189,9 @@ void ObjectGroup::draw() {
     }
 }
 
-void ObjectGroup::draw(int cameraX, int cameraY) {
+void ObjectGroup::draw(int offsetX, int offsetY) {
     for (int i = 0; i < gameObjectSize; i++) {
-        gameObjects[i]->draw(cameraX, cameraY);
+        gameObjects[i]->draw(offsetX, offsetY);
     }
 }
 
