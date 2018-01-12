@@ -1,31 +1,42 @@
 #include <SDL2/SDL.h>
+#include <SDL2/SDL_image.h>
+#include <SDL2/SDL_ttf.h>
 #include <iostream>
 #include <vector>
-#include <SDL2/SDL_image.h>
 #include "uberengine.h"
 
 
-class Player : public GameObject {
+class Player : public SpriteObject {
     public:
-        Player(int x, int y, Uint32 c, SDL_Renderer *r) : GameObject(r){
-            createSurface(x, y, 30, 30, c);
+        Player(SDL_Renderer *r, int x, int y, const char *f) : SpriteObject(r) {
+            createSurface(x, y, f); 
         }
 
         virtual void update() {
             const Uint8 *keys = SDL_GetKeyboardState(NULL);
             if (keys[SDL_SCANCODE_LEFT]) {
                 rect.x += -3;
+                angle += -3;
             }
             if (keys[SDL_SCANCODE_RIGHT]) {
                 rect.x += 3;
+                angle += 3;
             }
+        }
+};
+
+class Text : public TextObject {
+    public:
+        Text(SDL_Renderer *r, int x, int y, const char *t, int s, const char *f) : TextObject(r) {
+            createSurface(x, y, t, s, f); 
         }
 };
 
 class Game : public GameManager {
     public:
         Game() : GameManager(){
-            group.add(new Player(50, 50, SDL_MapRGB(screen->format, 255, 0, 0), renderer));
+            group.add(new Player(renderer, 50, 50, "Assets/player.png")); 
+            group.add(new Text(renderer, 200, 100, "Ceci n'est pas un test.", 42, "Assets/Roboto.ttf"));
         }
 
         virtual void update() {
@@ -39,6 +50,7 @@ class Game : public GameManager {
     private:
         ObjectGroup group;
 };
+
 
 int main() {
     Game game;

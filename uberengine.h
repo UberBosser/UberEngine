@@ -2,29 +2,56 @@
 #define UBERENGINE
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_image.h>
+#include <SDL2/SDL_ttf.h>
 #include <vector>
 
 
 class GameObject {
     public:
-        SDL_Rect rect;
+        bool operator== (const GameObject *gameObject) const; 
+        virtual void update();
+        virtual void draw();
+
+    protected:
+        SDL_Renderer *renderer;
+        SDL_Surface *surface;
+        SDL_Texture *texture; 
         double angle;
         SDL_Point pivot;
+        SDL_Rect rect;  
         SDL_RendererFlip flip;
-        GameObject();
-        GameObject(SDL_Renderer *r);
-        bool operator== (const GameObject &gameObject) const;
+};
+
+
+class SpriteObject : public GameObject {
+    public:
+        SpriteObject(SDL_Renderer *r); 
+
         void createSurface(int x, int y, int w, int h);
         void createSurface(int x, int y, int w, int h, Uint32 c);
-        void createSurface(int x, int y, const char img[]);
-        virtual void start();
+        void createSurface(int x, int y, const char *i);
+
+        virtual void update();
+        virtual void draw();
+};
+
+
+class TextObject : public GameObject {
+    public:
+        TextObject(SDL_Renderer *r); 
+
+        void createSurface(int x, int y, const char *t, int s, const char *f);
+
+        void updateText(const char *t);
+
         virtual void update();
         virtual void draw();
 
     private:
-        SDL_Renderer *renderer;
-        SDL_Surface *surface;
-        SDL_Texture *texture; 
+        TTF_Font *font;
+        SDL_Color color;
+        char *text;
+
 };
 
 
@@ -34,7 +61,7 @@ class ObjectGroup {
         std::vector <GameObject*> gameObjects;
         int gameObjectSize;
         void add(GameObject *g);
-        void remove(GameObject g);
+        void remove(GameObject *g);
         void update();
         void draw();
 };
