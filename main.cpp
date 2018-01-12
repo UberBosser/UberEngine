@@ -9,7 +9,7 @@
 class Player : public SpriteObject {
     public:
         Player(SDL_Renderer *r, int x, int y, const char *f) : SpriteObject(r) {
-            createSurface(x, y, f); 
+            createSurface(x, y, f);
         }
 
         virtual void update() {
@@ -25,6 +25,7 @@ class Player : public SpriteObject {
         }
 };
 
+
 class Text : public TextObject {
     public:
         Text(SDL_Renderer *r, int x, int y, const char *t, int s, const char *f) : TextObject(r) {
@@ -32,11 +33,15 @@ class Text : public TextObject {
         }
 };
 
+
 class Game : public GameManager {
     public:
         Game() : GameManager(){
+            camera = new GameCamera(getScreenWidth(), getScreenHeight());
             group.add(new Player(renderer, 50, 50, "Assets/player.png")); 
             group.add(new Text(renderer, 200, 100, "Ceci n'est pas un test.", 42, "Assets/Roboto.ttf"));
+            camera->setTarget(group.gameObjects[0]);
+            group.add(camera);
         }
 
         virtual void update() {
@@ -44,11 +49,12 @@ class Game : public GameManager {
         }
 
         virtual void draw() {
-            group.draw();
+            group.draw(camera->getPosX(), camera->getPosY());
         }
 
     private:
         ObjectGroup group;
+        GameCamera *camera;
 };
 
 

@@ -9,8 +9,17 @@
 class GameObject {
     public:
         bool operator== (const GameObject *gameObject) const; 
+
+        bool collideRect(GameObject gameObject);
+
+        int getPosX();
+        int getPosY();
+        int getWidth();
+        int getHeight();
+
         virtual void update();
         virtual void draw();
+        virtual void draw(int cameraX, int cameraY);
 
     protected:
         SDL_Renderer *renderer;
@@ -33,6 +42,7 @@ class SpriteObject : public GameObject {
 
         virtual void update();
         virtual void draw();
+        virtual void draw(int cameraX, int cameraY);
 };
 
 
@@ -46,12 +56,26 @@ class TextObject : public GameObject {
 
         virtual void update();
         virtual void draw();
+        virtual void draw(int cameraX, int cameraY);
 
     private:
         TTF_Font *font;
         SDL_Color color;
         char *text;
 
+};
+
+
+class GameCamera : public GameObject {
+    public:
+       GameCamera(int w, int h);
+
+       void setTarget(GameObject *gameObject);
+
+       virtual void update();
+
+    private:
+       GameObject *target;
 };
 
 
@@ -64,6 +88,7 @@ class ObjectGroup {
         void remove(GameObject *g);
         void update();
         void draw();
+        void draw(int cameraX, int cameraY);
 };
 
 
@@ -71,6 +96,9 @@ class GameManager {
     public:
         GameManager();
         GameManager(int x, int y);
+
+        int getScreenWidth();
+        int getScreenHeight();
 
         virtual void events();
         virtual void update();
@@ -87,6 +115,7 @@ class GameManager {
         Uint32 startTick;
         SDL_Event event;
         bool quit;
+        int screenWidth, screenHeight;
 };
 
 #endif

@@ -10,9 +10,43 @@ bool GameObject::operator==(const GameObject *gameObject) const {
     return (this == gameObject);
 }
 
+bool GameObject::collideRect(GameObject gameObject) {
+    if (rect.y + rect.h <= gameObject.rect.y) {
+        return false;
+    }
+    if (rect.y >= gameObject.rect.y + gameObject.rect.h) {
+        return false; 
+    }
+    if (rect.x + rect.w <= gameObject.rect.x) {
+        return false;
+    }
+    if (rect.x >= gameObject.rect.x + gameObject.rect.w) {
+        return false; 
+    }
+    return true;
+}
+
+int GameObject::getPosX() {
+    return rect.x;
+}
+
+int GameObject::getPosY() {
+    return rect.y;
+}
+
+int GameObject::getWidth() {
+    return rect.w;
+}
+
+int GameObject::getHeight() {
+    return rect.h;
+}
+
 void GameObject::update() {}
 
 void GameObject::draw() {}
+
+void GameObject::draw(int cameraX, int cameraY) {}
 
 
 SpriteObject::SpriteObject(SDL_Renderer *r) {
@@ -59,6 +93,12 @@ void SpriteObject::draw() {
     SDL_RenderCopyEx(renderer, texture, NULL, &rect, angle, &pivot, flip);
 }
 
+void SpriteObject::draw(int cameraX, int cameraY) {
+    rect.x -= cameraX;
+    rect.y -= cameraY;
+    SDL_RenderCopyEx(renderer, texture, NULL, &rect, angle, &pivot, flip);
+}
+
 
 TextObject::TextObject(SDL_Renderer *r) {
     renderer = r;
@@ -94,6 +134,28 @@ void TextObject::draw() {
     SDL_RenderCopyEx(renderer, texture, NULL, &rect, angle, &pivot, flip);
 }
 
+void TextObject::draw(int cameraX, int cameraY) {
+    rect.x -= cameraX;
+    rect.y -= cameraY;
+    SDL_RenderCopyEx(renderer, texture, NULL, &rect, angle, &pivot, flip);
+}
+
+GameCamera::GameCamera(int w, int h) {
+    rect.w = w;
+    rect.h = h;
+}
+
+void GameCamera::setTarget(GameObject *gameObject) {
+    target = gameObject;
+}
+
+void GameCamera::update() {
+    rect.x = (target->getPosX() + target->getWidth()/2) - rect.w/2;
+    rect.y = (target->getPosY() + target->getHeight()/2) - rect.h/2; 
+}
+
+
+
 
 ObjectGroup::ObjectGroup() {}
 
@@ -123,14 +185,22 @@ void ObjectGroup::draw() {
     }
 }
 
+void ObjectGroup::draw(int cameraX, int cameraY) {
+    for (int i = 0; i < gameObjectSize; i++) {
+        gameObjects[i]->draw(cameraX, cameraY);
+    }
+}
+
 
 GameManager::GameManager() {
     quit = false;
     SDL_Init(SDL_INIT_EVERYTHING);
     TTF_Init();
-    window = SDL_CreateWindow("uberengine", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, 1366, 768, SDL_WINDOW_FULLSCREEN_DESKTOP);
+    window = SDL_CreateWindow("UberEngine", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, 1366, 768, SDL_WINDOW_FULLSCREEN_DESKTOP);
     renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED);
     screen = SDL_GetWindowSurface(window);
+    screenWidth = 1366;
+    screenHeight = 768;
     SDL_SetWindowIcon(window, IMG_Load("Assets/icon.png"));
 }
 
@@ -138,10 +208,20 @@ GameManager::GameManager(int x, int y) {
     quit = false;
     SDL_Init(SDL_INIT_EVERYTHING);
     TTF_Init();
-    window = SDL_CreateWindow("uberengine", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, x, y, SDL_WINDOW_FULLSCREEN_DESKTOP);
+    window = SDL_CreateWindow("UberEngine", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, x, y, SDL_WINDOW_FULLSCREEN_DESKTOP);
     renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED);
     screen = SDL_GetWindowSurface(window);
+    screenWidth = x;
+    screenHeight = y;
     SDL_SetWindowIcon(window, IMG_Load("Assets/icon.png")); 
+}
+
+int GameManager::getScreenWidth() {
+    return screenWidth;
+}
+
+int GameManager::getScreenHeight() {
+    return screenHeight;
 }
 
 void GameManager::events() {
