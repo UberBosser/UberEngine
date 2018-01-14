@@ -11,16 +11,17 @@ class GameObject {
         bool operator== (const GameObject *gameObject) const; 
 
         bool collideRect(GameObject gameObject);
-
-        int getPosX();
-        int getPosY();
-        int getWidth();
-        int getHeight();
+        
+        SDL_Rect* getRect();
+        int* getPosX();
+        int* getPosY();
+        int* getWidth();
+        int* getHeight();
 
         SDL_Renderer* getRenderer();
 
-        void addChild(GameObject *g);
-        void removeChild(GameObject *g);
+        void addChild(GameObject* g);
+        void removeChild(GameObject* g);
         GameObject* getChild(int i);
         bool hasChildren();
 
@@ -90,11 +91,14 @@ class GameCamera : public GameObject {
 
        void setTarget(GameObject *gameObject);
        void setSize(int w, int h);
+       void setMaximumBounds(int w, int h);
 
        virtual void update();
 
     private:
        GameObject *target;
+       bool maxBounds;
+       int maxW, maxH;
 };
 
 

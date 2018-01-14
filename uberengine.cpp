@@ -26,20 +26,24 @@ bool GameObject::collideRect(GameObject gameObject) {
     return true;
 }
 
-int GameObject::getPosX() {
-    return rect.x;
+SDL_Rect* GameObject::getRect() {
+    return &rect;
 }
 
-int GameObject::getPosY() {
-    return rect.y;
+int* GameObject::getPosX() {
+    return &rect.x;
 }
 
-int GameObject::getWidth() {
-    return rect.w;
+int* GameObject::getPosY() {
+    return &rect.y;
 }
 
-int GameObject::getHeight() {
-    return rect.h;
+int* GameObject::getWidth() {
+    return &rect.w;
+}
+
+int* GameObject::getHeight() {
+    return &rect.h;
 }
 
 SDL_Renderer* GameObject::getRenderer() {
@@ -148,9 +152,13 @@ void SpriteObject::draw() {
 }
 
 void SpriteObject::draw(int offsetX, int offsetY) {
-    rect.x -= offsetX;
-    rect.y -= offsetY;
-    SDL_RenderCopyEx(renderer, texture, NULL, &rect, angle, &pivot, flip);
+    /* This is needs fixing badly */
+    SDL_Rect offsetRect;
+    offsetRect.x = rect.x - offsetX;
+    offsetRect.y = rect.y - offsetY;
+    offsetRect.w = rect.w;
+    offsetRect.h = rect.h;
+    SDL_RenderCopyEx(renderer, texture, NULL, &offsetRect, angle, &pivot, flip);
 }
 
 
@@ -197,9 +205,13 @@ void TextObject::draw() {
 }
 
 void TextObject::draw(int offsetX, int offsetY) {
-    rect.x -= offsetX;
-    rect.y -= offsetY;
-    SDL_RenderCopyEx(renderer, texture, NULL, &rect, angle, &pivot, flip);
+    /* This is needs fixing badly */
+    SDL_Rect offsetRect;
+    offsetRect.x = rect.x - offsetX;
+    offsetRect.y = rect.y - offsetY;
+    offsetRect.w = rect.w;
+    offsetRect.h = rect.h;
+    SDL_RenderCopyEx(renderer, texture, NULL, &offsetRect, angle, &pivot, flip);
 }
 
 
@@ -217,9 +229,30 @@ void GameCamera::setSize(int w, int h) {
     rect.h = h;
 }
 
+void GameCamera::setMaximumBounds(int w, int h) {
+    maxBounds = true;
+    maxW = w;
+    maxH = h;
+}
+
 void GameCamera::update() {
-    rect.x = (target->getPosX() + target->getWidth()/2) - rect.w/2;
-    rect.y = (target->getPosY() + target->getHeight()/2) - rect.h/2; 
+    SDL_Rect targetRect = *target->getRect();
+    rect.x = (targetRect.x + targetRect.w/2) - rect.w/2;
+    rect.y = (targetRect.y + targetRect.h/2) - rect.h/2; 
+    if (maxBounds) {
+        if (rect.x < 0) {
+            rect.x = 0;
+        }
+        if (rect.x > maxW - rect.w) {
+            rect.x = maxW - rect.w;
+        }
+        if (rect.y < 0) {
+            rect.y = 0; 
+        }
+        if (rect.y > maxH - rect.h) {
+            rect.y = maxH - rect.h;
+        }
+    }
 }
 
 
