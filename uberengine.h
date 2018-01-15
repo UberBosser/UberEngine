@@ -11,6 +11,7 @@ class GameObject {
         bool operator== (const GameObject *gameObject) const; 
 
         bool collideRect(GameObject gameObject);
+        bool collideRectVector(std::vector <GameObject*> rects, int size);
         
         SDL_Rect* getRect();
         int* getPosX();
@@ -23,7 +24,8 @@ class GameObject {
         void addChild(GameObject* g);
         void removeChild(GameObject* g);
         GameObject* getChild(int i);
-        bool hasChildren();
+        std::vector <GameObject*> getChildren();
+        int getChildrenSize();
 
         virtual void update();
         virtual void updateChildren();
@@ -102,14 +104,13 @@ class GameCamera : public GameObject {
 };
 
 
-class GameManager {
+class GameManager : public GameObject {
     public:
         GameManager();
         GameManager(int x, int y);
 
         int getScreenWidth();
         int getScreenHeight();
-        SDL_Renderer* getRenderer();
 
         virtual void events();
         virtual void update();
@@ -119,7 +120,6 @@ class GameManager {
     
     protected:
         SDL_Window *window;
-        SDL_Renderer *renderer;
         SDL_Surface *screen;
 
     private: 

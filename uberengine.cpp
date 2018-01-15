@@ -26,6 +26,15 @@ bool GameObject::collideRect(GameObject gameObject) {
     return true;
 }
 
+bool GameObject::collideRectVector(std::vector <GameObject*> rects, int size) {
+    for (int i = 0; i < size; i++) {
+        if (collideRect(*rects[i]) && rects[i] != this) {
+            return true;
+        }
+    }
+    return false;
+}
+
 SDL_Rect* GameObject::getRect() {
     return &rect;
 }
@@ -68,6 +77,14 @@ GameObject* GameObject::getChild(int i) {
     return children[i];
 }
 
+std::vector <GameObject*> GameObject::getChildren() {
+    return children;
+}
+
+int GameObject::getChildrenSize() {
+    return childrenSize;
+}
+
 void GameObject::update() {}
 
 void GameObject::updateChildren() {
@@ -104,11 +121,15 @@ void GameObject::drawChildren(int offsetX, int offsetY) {
 
 SpriteObject::SpriteObject(SDL_Renderer *r) {
     renderer = r;
+    flip = SDL_FLIP_NONE;
+    angle = 0;
 }
 
 SpriteObject::SpriteObject(GameObject *p) {
     parent = p;
     renderer = parent->getRenderer();
+    flip = SDL_FLIP_NONE;
+    angle = 0;
 }
 
 void SpriteObject::createSurface(int x, int y, int w, int h) {
@@ -118,6 +139,7 @@ void SpriteObject::createSurface(int x, int y, int w, int h) {
     rect.y = y;
     pivot.x = rect.w/2;
     pivot.y = rect.h/2;
+    SDL_FillRect(surface, NULL, SDL_MapRGB(surface->format, 255, 255, 255));
     texture = SDL_CreateTextureFromSurface(renderer, surface);
     SDL_FreeSurface(surface);
 }
@@ -288,10 +310,6 @@ int GameManager::getScreenHeight() {
     return screenHeight;
 }
 
-SDL_Renderer* GameManager::getRenderer() {
-    return renderer;
-}
-
 void GameManager::events() {
     while (SDL_PollEvent(&event) != 0) {
         if (event.type == SDL_QUIT) {
@@ -319,8 +337,10 @@ void GameManager::loop() {
         startTick = SDL_GetTicks();
         events();
         update();
+        updateChildren();
         SDL_RenderClear(renderer);
         draw();
+        drawChildren();
         SDL_RenderPresent(renderer);
         capFps();
     }

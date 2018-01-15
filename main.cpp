@@ -38,9 +38,9 @@ class Game : public GameManager {
     public:
         Game() {
             camera = new GameCamera(getScreenWidth(), getScreenHeight());
-            player = new Player(renderer, 50, 50, "Assets/player.png");
+            addChild(new Player(renderer, 50, 50, "Assets/player.png"));
             camera->setMaximumBounds(2000, getScreenHeight());
-            player->addChild(new Text(renderer, 200, 100, "Ceci n'est pas un test. ", 42, "Assets/Roboto.ttf"));
+            addChild(new Text(renderer, 200, 100, "Ceci n'est pas un test. ", 42, "Assets/Roboto.ttf"));
             camera->setTarget(player);
         }
 
