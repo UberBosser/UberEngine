@@ -21,18 +21,9 @@ class GameObject {
 
         SDL_Renderer* getRenderer();
 
-        void addChild(GameObject* g);
-        void removeChild(GameObject* g);
-        GameObject* getChild(int i);
-        std::vector <GameObject*> getChildren();
-        int getChildrenSize();
-
         virtual void update();
-        virtual void updateChildren();
         virtual void draw();
         virtual void draw(int offsetX, int offsetY);
-        virtual void drawChildren();
-        virtual void drawChildren(int offsetX, int offsetY);
 
     protected:
         SDL_Renderer *renderer;
@@ -42,12 +33,10 @@ class GameObject {
         double angle;
         SDL_Point pivot;
         SDL_Rect rect;  
+        bool collidable;
         SDL_RendererFlip flip;
         
         GameObject *parent;
-
-        std::vector <GameObject*> children;
-        int childrenSize;
 };
 
 
@@ -84,6 +73,50 @@ class TextObject : public GameObject {
         SDL_Color color;
         char *text;
 
+};
+
+
+template <class object>
+class GameObjects : public GameObject {
+    public:
+        void add(object* g) {
+            gameObjects.push_back(g);
+            gameObjectsSize = gameObjects.size();
+        }
+        void remove(object* g) {
+            for (int i = 0; i < gameObjectsSize; i++) {
+                if (*gameObjects[i] == g) {
+                    gameObjects.erase(gameObjects.begin() + i);
+                    gameObjects = gameObjects.size();
+                }
+            }
+        }
+        object* get(int i) {
+            return gameObjects[i] ;
+        }
+        int getObjectsSize() {
+            return gameObjectsSize;
+        }
+
+        virtual void update() {
+            for (int i = 0; i < gameObjectsSize; i++) {
+                gameObjects[i]->update();
+            }
+        }
+        virtual void draw() {
+            for (int i = 0; i < gameObjectsSize; i++) {
+                gameObjects[i]->draw();
+            }
+        }
+        virtual void draw(int offsetX, int offsetY) {
+            for (int i = 0; i < gameObjectsSize; i++) {
+                gameObjects[i] ->draw(offsetX, offsetY);
+            }
+        }
+
+    private:
+        std::vector <object*> gameObjects;
+        int gameObjectsSize;
 };
 
 

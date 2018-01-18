@@ -11,19 +11,22 @@ bool GameObject::operator==(const GameObject *gameObject) const {
 }
 
 bool GameObject::collideRect(GameObject gameObject) {
-    if (rect.y + rect.h <= gameObject.rect.y) {
-        return false;
+    if (gameObject.collidable) {
+        if (rect.y + rect.h <= gameObject.rect.y) {
+            return false;
+        }
+        if (rect.y >= gameObject.rect.y + gameObject.rect.h) {
+            return false; 
+        }
+        if (rect.x + rect.w <= gameObject.rect.x) {
+            return false;
+        }
+        if (rect.x >= gameObject.rect.x + gameObject.rect.w) {
+            return false; 
+        }
+        return true;
     }
-    if (rect.y >= gameObject.rect.y + gameObject.rect.h) {
-        return false; 
-    }
-    if (rect.x + rect.w <= gameObject.rect.x) {
-        return false;
-    }
-    if (rect.x >= gameObject.rect.x + gameObject.rect.w) {
-        return false; 
-    }
-    return true;
+    return false;
 }
 
 bool GameObject::collideRectVector(std::vector <GameObject*> rects, int size) {
@@ -59,64 +62,11 @@ SDL_Renderer* GameObject::getRenderer() {
     return renderer;
 }
 
-void GameObject::addChild(GameObject *g) {
-    children.push_back(g);
-    childrenSize = children.size();
-}
-
-void GameObject::removeChild(GameObject *g) {
-    for (int i = 0; i < childrenSize; i++) {
-        if (*children[i] == g) {
-            children.erase(children.begin() + i);
-            childrenSize = children.size();
-        }
-    }
-}
-
-GameObject* GameObject::getChild(int i) {
-    return children[i];
-}
-
-std::vector <GameObject*> GameObject::getChildren() {
-    return children;
-}
-
-int GameObject::getChildrenSize() {
-    return childrenSize;
-}
-
 void GameObject::update() {}
-
-void GameObject::updateChildren() {
-    for (int i = 0; i < childrenSize; i++) {
-        children[i]->update();
-        if (!children[i]->children.empty()) {
-            children[i]->update();
-        }
-    }
-}
 
 void GameObject::draw() {}
 
 void GameObject::draw(int offsetX, int offsetY) {}
-
-void GameObject::drawChildren() {
-    for (int i = 0; i < childrenSize; i++) {
-        children[i]->draw();
-        if (!children[i]->children.empty()) {
-            children[i]->drawChildren(); 
-        } 
-    }
-}
-
-void GameObject::drawChildren(int offsetX, int offsetY) {
-    for (int i = 0; i < childrenSize; i++) {
-        children[i]->draw(offsetX, offsetY);
-        if (!children[i]->children.empty()) {
-            children[i]->drawChildren(offsetX, offsetY); 
-        }
-    }
-}
 
 
 SpriteObject::SpriteObject(SDL_Renderer *r) {
@@ -337,10 +287,8 @@ void GameManager::loop() {
         startTick = SDL_GetTicks();
         events();
         update();
-        updateChildren();
         SDL_RenderClear(renderer);
         draw();
-        drawChildren();
         SDL_RenderPresent(renderer);
         capFps();
     }
