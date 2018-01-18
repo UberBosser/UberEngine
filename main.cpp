@@ -38,9 +38,9 @@ class Game : public GameManager {
     public:
         Game() {
             camera = new GameCamera(getScreenWidth(), getScreenHeight());
-            addChild(new Player(renderer, 50, 50, "Assets/player.png"));
+            player = new Player(renderer, 50, 50, "Assets/player.png");
             camera->setMaximumBounds(2000, getScreenHeight());
-            addChild(new Text(renderer, 200, 100, "Ceci n'est pas un test. ", 42, "Assets/Roboto.ttf"));
+            text = new Text(renderer, 200, 100, "Ceci n'est pas un test. ", 42, "Assets/Roboto.ttf");
             camera->setTarget(player);
         }
 
@@ -51,12 +51,13 @@ class Game : public GameManager {
 
         virtual void draw() {
             player->draw(*camera->getPosX(), *camera->getPosY());
-            player->drawChildren(*camera->getPosX(),*camera->getPosY());
+            text->draw(*camera->getPosX(), *camera->getPosY());
         }
 
     private:
         GameCamera *camera;
         Player *player;
+        Text *text;
 };
 
 
