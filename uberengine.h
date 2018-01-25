@@ -22,6 +22,8 @@ class GameObject {
         SDL_Renderer* getRenderer();
 
         virtual void update();
+        void drawTexture();
+        void drawTexture(int offsetX, int offsetY);
         virtual void draw();
         virtual void draw(int offsetX, int offsetY);
 
@@ -32,7 +34,8 @@ class GameObject {
 
         double angle;
         SDL_Point pivot;
-        SDL_Rect rect;  
+        SDL_Rect rect;
+        SDL_Rect offsetRect;
         bool collidable;
         SDL_RendererFlip flip;
         
@@ -140,7 +143,7 @@ class GameCamera : public GameObject {
 class GameManager : public GameObject {
     public:
         GameManager();
-        GameManager(int x, int y);
+        GameManager(const char* t, int w, int h, Uint32 f);
 
         int getScreenWidth();
         int getScreenHeight();

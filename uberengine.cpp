@@ -1,6 +1,7 @@
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_image.h>
 #include <SDL2/SDL_ttf.h>
+#include <SDL2/SDL_mixer.h>
 #include <iostream>
 #include <vector>
 #include "uberengine.h"
@@ -64,6 +65,18 @@ SDL_Renderer* GameObject::getRenderer() {
 
 void GameObject::update() {}
 
+void GameObject::drawTexture() {
+    SDL_RenderCopyEx(renderer, texture, NULL, &rect, angle, &pivot, flip);
+}
+
+void GameObject::drawTexture(int offsetX, int offsetY) {
+    offsetRect.x = rect.x - offsetX;
+    offsetRect.y = rect.y - offsetY;
+    offsetRect.w = rect.w;
+    offsetRect.h = rect.h;
+    SDL_RenderCopyEx(renderer, texture, NULL, &offsetRect, angle, &pivot, flip);
+}
+
 void GameObject::draw() {}
 
 void GameObject::draw(int offsetX, int offsetY) {}
@@ -120,17 +133,11 @@ void SpriteObject::createSurface(int x, int y, const char *i) {
 void SpriteObject::update() {}
 
 void SpriteObject::draw() {
-    SDL_RenderCopyEx(renderer, texture, NULL, &rect, angle, &pivot, flip);
+    drawTexture();
 }
 
 void SpriteObject::draw(int offsetX, int offsetY) {
-    /* This is needs fixing badly */
-    SDL_Rect offsetRect;
-    offsetRect.x = rect.x - offsetX;
-    offsetRect.y = rect.y - offsetY;
-    offsetRect.w = rect.w;
-    offsetRect.h = rect.h;
-    SDL_RenderCopyEx(renderer, texture, NULL, &offsetRect, angle, &pivot, flip);
+    drawTexture(offsetX, offsetY);
 }
 
 
@@ -173,17 +180,11 @@ void TextObject::updateText(const char *t) {
 void TextObject::update() {}
 
 void TextObject::draw() {
-    SDL_RenderCopyEx(renderer, texture, NULL, &rect, angle, &pivot, flip);
+    drawTexture();
 }
 
 void TextObject::draw(int offsetX, int offsetY) {
-    /* This is needs fixing badly */
-    SDL_Rect offsetRect;
-    offsetRect.x = rect.x - offsetX;
-    offsetRect.y = rect.y - offsetY;
-    offsetRect.w = rect.w;
-    offsetRect.h = rect.h;
-    SDL_RenderCopyEx(renderer, texture, NULL, &offsetRect, angle, &pivot, flip);
+    drawTexture(offsetX, offsetY);
 }
 
 
@@ -240,15 +241,15 @@ GameManager::GameManager() {
     SDL_SetWindowIcon(window, IMG_Load("Assets/icon.png"));
 }
 
-GameManager::GameManager(int x, int y) {
+GameManager::GameManager(const char* t, int w, int h, Uint32 f) {
     quit = false;
     SDL_Init(SDL_INIT_EVERYTHING);
     TTF_Init();
-    window = SDL_CreateWindow("UberEngine", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, x, y, SDL_WINDOW_FULLSCREEN_DESKTOP);
+    window = SDL_CreateWindow(t, SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, w, h, f);
     renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED);
     screen = SDL_GetWindowSurface(window);
-    screenWidth = x;
-    screenHeight = y;
+    screenWidth = w;
+    screenHeight = h;
     SDL_SetWindowIcon(window, IMG_Load("Assets/icon.png")); 
 }
 
@@ -267,7 +268,8 @@ void GameManager::events() {
         }
         if (event.type == SDL_KEYDOWN) {
             if (event.key.keysym.sym == SDLK_ESCAPE) {
-            quit = true;}
+                quit = true;
+            }
         }
     }
 }
@@ -283,7 +285,7 @@ void GameManager::capFps() {
 }
 
 void GameManager::loop() {
-    while (quit == false) {
+    while (!quit) {
         startTick = SDL_GetTicks();
         events();
         update();
@@ -294,5 +296,6 @@ void GameManager::loop() {
     }
     SDL_DestroyRenderer(renderer);
     SDL_DestroyWindow(window);
+    Mix_Quit();
     SDL_Quit();
 }
