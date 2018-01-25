@@ -82,6 +82,9 @@ class TextObject : public GameObject {
 template <class object>
 class GameObjects : public GameObject {
     public:
+        GameObjects() {
+            gameObjectsSize = 0;
+        }
         void add(object* g) {
             gameObjects.push_back(g);
             gameObjectsSize = gameObjects.size();
@@ -90,7 +93,7 @@ class GameObjects : public GameObject {
             for (int i = 0; i < gameObjectsSize; i++) {
                 if (*gameObjects[i] == g) {
                     gameObjects.erase(gameObjects.begin() + i);
-                    gameObjects = gameObjects.size();
+                    gameObjectsSize = gameObjects.size();
                 }
             }
         }
