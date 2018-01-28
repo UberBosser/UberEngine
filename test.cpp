@@ -7,6 +7,7 @@
 #include "uberengine.h"
 #include <time.h>
 
+
 class Bullet : public SpriteObject {
     public:
         Bullet(GameObject* o, GameObjects <Bullet>* b, int x) : SpriteObject(o) {
@@ -15,7 +16,7 @@ class Bullet : public SpriteObject {
         }
         void update() {
             rect.y -= 3;
-            if (rect.y + rect.h < 0) {
+            if (rect.y + rect.h < 40) {
                 bullets->remove(this);
             }
         }
@@ -64,12 +65,15 @@ class Game : public GameManager {
         void draw() {
             player->draw();
         }
+        ~Game() {
+            delete player;
+        }
     private:
         Player* player;
 };
 
 
 int main() {
-    Game g;
-    g.loop();
+    Game game;
+    game.loop();
 }

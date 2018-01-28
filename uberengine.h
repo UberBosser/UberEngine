@@ -27,6 +27,8 @@ class GameObject {
         virtual void draw();
         virtual void draw(int offsetX, int offsetY);
 
+        virtual ~GameObject();
+
     protected:
         SDL_Renderer *renderer;
         SDL_Surface *surface;
@@ -91,8 +93,9 @@ class GameObjects : public GameObject {
         }
         void remove(object* g) {
             for (int i = 0; i < gameObjectsSize; i++) {
-                if (*gameObjects[i] == g) {
-                    gameObjects.erase(gameObjects.begin() + i);
+                if (gameObjects[i] == g) {
+                    delete gameObjects[i];
+                    gameObjects.erase(gameObjects.begin() + i); 
                     gameObjectsSize = gameObjects.size();
                 }
             }
@@ -116,8 +119,15 @@ class GameObjects : public GameObject {
         }
         virtual void draw(int offsetX, int offsetY) {
             for (int i = 0; i < gameObjectsSize; i++) {
-                gameObjects[i] ->draw(offsetX, offsetY);
+                gameObjects[i]->draw(offsetX, offsetY);
             }
+        }
+        ~GameObjects() {
+            for (int i = 0; i < gameObjectsSize; i++) {
+                delete gameObjects[i];
+                gameObjectsSize = gameObjects.size();
+            }
+            gameObjects.clear();
         }
 
     private:

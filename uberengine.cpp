@@ -81,6 +81,8 @@ void GameObject::draw() {}
 
 void GameObject::draw(int offsetX, int offsetY) {}
 
+GameObject::~GameObject() {}
+
 
 SpriteObject::SpriteObject(SDL_Renderer *r) {
     renderer = r;
@@ -294,8 +296,10 @@ void GameManager::loop() {
         SDL_RenderPresent(renderer);
         capFps();
     }
+    SDL_FreeSurface(screen);
     SDL_DestroyRenderer(renderer);
     SDL_DestroyWindow(window);
     Mix_Quit();
+    IMG_Quit();
     SDL_Quit();
 }
