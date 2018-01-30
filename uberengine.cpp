@@ -12,7 +12,6 @@ bool GameObject::operator==(const GameObject *gameObject) const {
 }
 
 bool GameObject::collideRect(GameObject gameObject) {
-    if (gameObject.collidable) {
         if (rect.y + rect.h <= gameObject.rect.y) {
             return false;
         }
@@ -26,8 +25,6 @@ bool GameObject::collideRect(GameObject gameObject) {
             return false; 
         }
         return true;
-    }
-    return false;
 }
 
 bool GameObject::collideRectVector(std::vector <GameObject*> rects, int size) {
@@ -261,6 +258,10 @@ int GameManager::getScreenWidth() {
 
 int GameManager::getScreenHeight() {
     return screenHeight;
+}
+
+void GameManager::setQuit(bool q) {
+    quit = q;
 }
 
 void GameManager::events() {

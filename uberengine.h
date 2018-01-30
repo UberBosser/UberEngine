@@ -161,6 +161,8 @@ class GameManager : public GameObject {
         int getScreenWidth();
         int getScreenHeight();
 
+        void setQuit(bool q);
+
         virtual void events();
         virtual void update();
         virtual void draw();
