@@ -1,5 +1,5 @@
-#ifndef UBERENGINE
-#define UBERENGINE
+#ifndef UBERENGINE_H
+#define UBERENGINE_H
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_image.h>
 #include <SDL2/SDL_ttf.h>
@@ -27,6 +27,8 @@ class GameObject {
         void drawTexture(int offsetX, int offsetY);
         virtual void draw();
         virtual void draw(int offsetX, int offsetY);
+
+        virtual ~GameObject();
 
     protected:
         SDL_Renderer *renderer;
@@ -103,6 +105,14 @@ class GameObjects : public GameObject {
                 }
             }
         }
+        void clear() {
+            for (int i = 0; i < gameObjectsSize; i++) {
+                    delete gameObjects[i];
+                    gameObjectsSize = gameObjects.size();
+                }
+                gameObjects.clear();
+        }
+
         object* get(int i) {
             return gameObjects[i] ;
         }
@@ -125,12 +135,9 @@ class GameObjects : public GameObject {
                 gameObjects[i]->draw(offsetX, offsetY);
             }
         }
+
         ~GameObjects() {
-            for (int i = 0; i < gameObjectsSize; i++) {
-                delete gameObjects[i];
-                gameObjectsSize = gameObjects.size();
-            }
-            gameObjects.clear();
+            
         }
 
     private:
