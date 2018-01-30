@@ -7,6 +7,7 @@
 
 
 class GameObject {
+    // The Base of any object in the engine.
     public:
         bool operator== (const GameObject *gameObject) const; 
 
@@ -27,8 +28,6 @@ class GameObject {
         virtual void draw();
         virtual void draw(int offsetX, int offsetY);
 
-        virtual ~GameObject();
-
     protected:
         SDL_Renderer *renderer;
         SDL_Surface *surface;
@@ -46,6 +45,7 @@ class GameObject {
 
 
 class SpriteObject : public GameObject {
+    // SpriteObjects are drawable Sprites, they can load images or make rectangles.
     public:
         SpriteObject(SDL_Renderer *r);
         SpriteObject(GameObject *p); 
@@ -56,11 +56,13 @@ class SpriteObject : public GameObject {
 
         virtual void update();
         virtual void draw();
+        // Offset is usually for the CameraObject
         virtual void draw(int offsetX, int offsetY);
 };
 
 
 class TextObject : public GameObject {
+    // Kind of like the SpriteObject, but instead it loads a font to draw text.
     public:
         TextObject(SDL_Renderer *r);
         TextObject(GameObject *p);
@@ -83,6 +85,7 @@ class TextObject : public GameObject {
 
 template <class object>
 class GameObjects : public GameObject {
+    // A group of GameObjects and their children, provides an easy way to manage multiple GameObjects.
     public:
         GameObjects() {
             gameObjectsSize = 0;
@@ -137,6 +140,7 @@ class GameObjects : public GameObject {
 
 
 class GameCamera : public GameObject {
+    // GameCamera for when you want to follow a GameObject around.
     public:
        GameCamera(int w, int h);
 
@@ -154,6 +158,7 @@ class GameCamera : public GameObject {
 
 
 class GameManager : public GameObject {
+    // Includes window, screen creation and game loop.
     public:
         GameManager();
         GameManager(const char* t, int w, int h, Uint32 f);

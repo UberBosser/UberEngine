@@ -78,8 +78,6 @@ void GameObject::draw() {}
 
 void GameObject::draw(int offsetX, int offsetY) {}
 
-GameObject::~GameObject() {}
-
 
 SpriteObject::SpriteObject(SDL_Renderer *r) {
     renderer = r;
