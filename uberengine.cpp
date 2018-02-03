@@ -227,6 +227,44 @@ void GameCamera::update() {
     }
 }
 
+SoundManager::SoundManager(const char *d) {
+    sound = Mix_LoadWAV(d);
+    Mix_VolumeChunk(sound, 64);
+}
+
+SoundManager::SoundManager(const char *d, const int v) {
+    sound = Mix_LoadWAV(d);
+    Mix_VolumeChunk(sound, v);
+}
+
+void SoundManager::play() {
+    Mix_PlayChannel(-1, sound, 0);
+}
+
+void SoundManager::play(int l) {
+    Mix_PlayChannel(-1, sound, l);
+}
+
+SoundManager::~SoundManager() {
+    Mix_FreeChunk(sound);
+}
+
+
+MusicManager::MusicManager(const char *d) {
+    music = Mix_LoadMUS(d);
+}
+
+void MusicManager::play() {
+    Mix_PlayMusic(music, -1);
+}
+
+void MusicManager::play(int l) {
+    Mix_PlayMusic(music, -1);
+}
+
+MusicManager::~MusicManager() {
+    Mix_FreeMusic(music);
+}
 
 GameManager::GameManager() {
     quit = false;
@@ -235,6 +273,7 @@ GameManager::GameManager() {
     window = SDL_CreateWindow("UberEngine", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, 1366, 768, SDL_WINDOW_FULLSCREEN_DESKTOP);
     renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED);
     screen = SDL_GetWindowSurface(window);
+    Mix_OpenAudio(48000, MIX_DEFAULT_FORMAT, 2, 1536);
     screenWidth = 1366;
     screenHeight = 768;
     SDL_SetWindowIcon(window, IMG_Load("Assets/icon.png"));
@@ -247,6 +286,7 @@ GameManager::GameManager(const char* t, int w, int h, Uint32 f) {
     window = SDL_CreateWindow(t, SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, w, h, f);
     renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED);
     screen = SDL_GetWindowSurface(window);
+    Mix_OpenAudio(48000, MIX_DEFAULT_FORMAT, 2, 1536);
     screenWidth = w;
     screenHeight = h;
     SDL_SetWindowIcon(window, IMG_Load("Assets/icon.png")); 

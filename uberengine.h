@@ -3,6 +3,7 @@
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_image.h>
 #include <SDL2/SDL_ttf.h>
+#include <SDL2/SDL_mixer.h>
 #include <vector>
 
 
@@ -161,6 +162,31 @@ class GameCamera : public GameObject {
        GameObject *target;
        bool maxBounds;
        int maxW, maxH;
+};
+
+
+class SoundManager : public GameObject {
+    public:
+        SoundManager(const char *d);
+        SoundManager(const char *d, const int v);
+        void play();
+        void play(int i);
+        ~SoundManager();
+
+    private:
+        Mix_Chunk *sound;
+};
+
+
+class MusicManager : public GameObject {
+    public:
+        MusicManager(const char *d);
+        void play();
+        void play(int t);
+        ~MusicManager();
+
+    private:
+        Mix_Music *music;
 };
 
 

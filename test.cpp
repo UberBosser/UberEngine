@@ -55,6 +55,7 @@ class Player : public SpriteObject {
     public:
         Player(GameManager* o, GameObjects <Meteor>* m) : SpriteObject(o) {
             createSurface(116, 210, "Assets/ship.png");
+            shootSound = new SoundManager("Assets/laser.wav");
             meteors = m;
             gameManager = o;
             shotSpawn = 20;
@@ -75,6 +76,7 @@ class Player : public SpriteObject {
             }
             if (shotSpawn == 20 && keys[SDL_SCANCODE_SPACE]) {
                 bullets.add(new Bullet(this, meteors, &bullets, rect.x + 11));
+                shootSound->play();
                 shotSpawn = 0;
             } else if (shotSpawn < 20) {
                 shotSpawn++; 
@@ -89,6 +91,7 @@ class Player : public SpriteObject {
     private:
         GameObjects <Bullet> bullets;
         GameObjects <Meteor>* meteors;
+        SoundManager *shootSound;
         GameManager* gameManager;
         int shotSpawn;
 };
@@ -98,6 +101,8 @@ class Game : public GameManager {
     public:
         Game() : GameManager("NewGame", 256, 256, 0) { 
             player = new Player(this, &meteors);
+            music = new MusicManager("Assets/music.wav");
+            music->play();
             srand(time(NULL));
             meteorSpawn = 0;
         }
@@ -127,6 +132,7 @@ class Game : public GameManager {
     private:
         Player* player;
         GameObjects <Meteor> meteors;
+        MusicManager *music;
         int meteorSpawn;
 };
 
