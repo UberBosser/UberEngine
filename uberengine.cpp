@@ -62,18 +62,6 @@ SDL_Renderer* GameObject::getRenderer() {
 
 void GameObject::update() {}
 
-void GameObject::drawTexture() {
-    SDL_RenderCopyEx(renderer, texture, NULL, &rect, angle, &pivot, flip);
-}
-
-void GameObject::drawTexture(int offsetX, int offsetY) {
-    offsetRect.x = rect.x - offsetX;
-    offsetRect.y = rect.y - offsetY;
-    offsetRect.w = rect.w;
-    offsetRect.h = rect.h;
-    SDL_RenderCopyEx(renderer, texture, NULL, &offsetRect, angle, &pivot, flip);
-}
-
 void GameObject::draw() {}
 
 void GameObject::draw(int offsetX, int offsetY) {}
@@ -97,6 +85,7 @@ SpriteObject::SpriteObject(GameObject *p) {
 void SpriteObject::createSurface(int x, int y, int w, int h) {
     surface = SDL_CreateRGBSurface(0, w, h, 32, 0, 0, 0, 0);
     rect = surface->clip_rect;
+    dRect = surface->clip_rect;
     rect.x = x;
     rect.y = y;
     pivot.x = rect.w/2;
@@ -109,6 +98,7 @@ void SpriteObject::createSurface(int x, int y, int w, int h) {
 void SpriteObject::createSurface(int x, int y, int w, int h, Uint32 c) {
     surface = SDL_CreateRGBSurface(0, w, h, 32, 0, 0, 0, 0);
     rect = surface->clip_rect;
+    dRect = surface->clip_rect;
     rect.x = x;
     rect.y = y;
     pivot.x = rect.w/2;
@@ -121,6 +111,7 @@ void SpriteObject::createSurface(int x, int y, int w, int h, Uint32 c) {
 void SpriteObject::createSurface(int x, int y, const char *i) {
     surface = IMG_Load(i);
     rect = surface->clip_rect;
+    dRect = surface->clip_rect;
     rect.x = x;
     rect.y = y;
     pivot.x = rect.w/2;
@@ -129,7 +120,63 @@ void SpriteObject::createSurface(int x, int y, const char *i) {
     SDL_FreeSurface(surface);
 }
 
+void SpriteObject::createSurface(int x, int y, int w, int h, const char *i) {
+    surface = IMG_Load(i);
+    rect = surface->clip_rect;
+    for (int y = 0; y < rect.h/h; y++) {
+        for (int x = 0; x < rect.w/w; x++) {
+            SDL_Rect r = {x * w, y * h, w, h};
+            frames.push_back(r);
+        }
+    }
+    dRect = frames[0];
+    rect.w = w;
+    rect.h = h;
+    rect.x = x;
+    rect.y = y;
+    pivot.x = dRect.w/2;
+    pivot.y = dRect.h/2;
+    texture = SDL_CreateTextureFromSurface(renderer, surface);
+    SDL_FreeSurface(surface);
+}
+
+void SpriteObject::createSurface(int x, int y, int w, int h, int f, const char *i) {
+    surface = IMG_Load(i);
+    rect = surface->clip_rect;
+    for (int y = 0; y < rect.h/h; y++) {
+        for (int x = 0; x < rect.w/w; x++) {
+            SDL_Rect r = {x * w, y * h, w, h};
+            frames.push_back(r);
+        }
+    }
+    dRect = frames[f];
+    rect.w = w;
+    rect.h = h;
+    rect.x = x;
+    rect.y = y;
+    pivot.x = dRect.w/2;
+    pivot.y = dRect.h/2;
+    texture = SDL_CreateTextureFromSurface(renderer, surface);
+    SDL_FreeSurface(surface);
+}
+
+void SpriteObject::changeFrame(int i) {
+    dRect = frames[i];
+}
+
 void SpriteObject::update() {}
+
+void SpriteObject::drawTexture() {
+    SDL_RenderCopyEx(renderer, texture, &dRect, &rect, angle, &pivot, flip);
+}
+
+void SpriteObject::drawTexture(int offsetX, int offsetY) {
+    offsetRect.x = rect.x - offsetX;
+    offsetRect.y = rect.y - offsetY;
+    offsetRect.w = rect.w;
+    offsetRect.h = rect.h;
+    SDL_RenderCopyEx(renderer, texture, &dRect, &offsetRect, angle, &pivot, flip);
+}
 
 void SpriteObject::draw() {
     drawTexture();
@@ -177,6 +224,18 @@ void TextObject::updateText(const char *t) {
 }
 
 void TextObject::update() {}
+
+void TextObject::drawTexture() {
+    SDL_RenderCopyEx(renderer, texture, NULL, &rect, angle, &pivot, flip);
+}
+
+void TextObject::drawTexture(int offsetX, int offsetY) {
+    offsetRect.x = rect.x - offsetX;
+    offsetRect.y = rect.y - offsetY;
+    offsetRect.w = rect.w;
+    offsetRect.h = rect.h;
+    SDL_RenderCopyEx(renderer, texture, NULL, &offsetRect, angle, &pivot, flip);
+}
 
 void TextObject::draw() {
     drawTexture();

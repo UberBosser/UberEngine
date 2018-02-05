@@ -23,9 +23,7 @@ class GameObject {
 
         SDL_Renderer* getRenderer();
 
-        virtual void update();
-        void drawTexture();
-        void drawTexture(int offsetX, int offsetY);
+        virtual void update(); 
         virtual void draw();
         virtual void draw(int offsetX, int offsetY);
 
@@ -39,6 +37,7 @@ class GameObject {
         double angle;
         SDL_Point pivot;
         SDL_Rect rect;
+        SDL_Rect dRect;
         SDL_Rect offsetRect;
         bool collidable;
         SDL_RendererFlip flip;
@@ -56,11 +55,18 @@ class SpriteObject : public GameObject {
         void createSurface(int x, int y, int w, int h);
         void createSurface(int x, int y, int w, int h, Uint32 c);
         void createSurface(int x, int y, const char *i);
-
+        void createSurface(int x, int y, int w, int h, const char *i);
+        void createSurface(int x, int y, int w, int h, int f, const char *i);
+        void changeFrame(int i);
         virtual void update();
         virtual void draw();
-        // Offset is usually for the CameraObject
+        // Offset is usually for the CameraObject.
+        void drawTexture();
+        void drawTexture(int offsetX, int offsetY); 
         virtual void draw(int offsetX, int offsetY);
+
+    private: 
+        std::vector <SDL_Rect> frames;
 };
 
 
@@ -75,6 +81,8 @@ class TextObject : public GameObject {
         void updateText(const char *t);
 
         virtual void update();
+        void drawTexture();
+        void drawTexture(int offsetX, int offsetY);
         virtual void draw();
         virtual void draw(int offsetX, int offsetY);
 
@@ -100,7 +108,6 @@ class GameObjects : public GameObject {
         void remove(object* g) {
             for (int i = 0; i < gameObjectsSize; i++) {
                 if (gameObjects[i] == g) {
-                    delete gameObjects[i];
                     gameObjects.erase(gameObjects.begin() + i); 
                     gameObjectsSize = gameObjects.size();
                 }

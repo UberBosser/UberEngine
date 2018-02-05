@@ -18,6 +18,7 @@ class Meteor : public SpriteObject {
                 meteors->remove(this);
             }
         } 
+
     private:
         GameObjects <Meteor>* meteors;
         int speed;
@@ -54,7 +55,7 @@ class Bullet : public SpriteObject {
 class Player : public SpriteObject {
     public:
         Player(GameManager* o, GameObjects <Meteor>* m) : SpriteObject(o) {
-            createSurface(116, 210, "Assets/ship.png");
+            createSurface(116, 210, 24, 28, 1, "Assets/ship.png");
             shootSound = new SoundManager("Assets/laser.wav");
             meteors = m;
             gameManager = o;
