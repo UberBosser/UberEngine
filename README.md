@@ -1,9 +1,12 @@
 # UberEngine
 A "minimalist" 2D SDL game engine. Also my starter C++ project.
 
-### To Do list
+## Features
 * Easy Collisions
-* Audio Manager
+* Music/Sound manager
 * Camera
-* Animations
-* And more...
+* Spritesheet/Animations
+
+### TODO
+* Tilemaps
+* More...
