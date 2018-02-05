@@ -21,6 +21,9 @@ class GameObject {
         int* getWidth();
         int* getHeight();
 
+        // Input a vector to change position.
+        void changePosition(int x, int y);
+
         SDL_Renderer* getRenderer();
 
         virtual void update(); 

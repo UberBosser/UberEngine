@@ -56,6 +56,11 @@ int* GameObject::getHeight() {
     return &rect.h;
 }
 
+void GameObject::changePosition(int x, int y) {
+    rect.x += x;
+    rect.y += y;
+}
+
 SDL_Renderer* GameObject::getRenderer() {
     return renderer;
 }
