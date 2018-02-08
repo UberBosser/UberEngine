@@ -13,7 +13,6 @@ class GameObject {
         bool operator== (const GameObject *gameObject) const; 
 
         bool collideRect(GameObject gameObject);
-        bool collideRectVector(std::vector <GameObject*> rects, int size);
         
         SDL_Rect* getRect();
         int* getPosX();
@@ -28,7 +27,7 @@ class GameObject {
 
         virtual void update(); 
         virtual void draw();
-        virtual void draw(int offsetX, int offsetY);
+        virtual void draw(GameObject* r);
 
         virtual ~GameObject();
 
@@ -65,8 +64,8 @@ class SpriteObject : public GameObject {
         virtual void draw();
         // Offset is usually for the CameraObject.
         void drawTexture();
-        void drawTexture(int offsetX, int offsetY); 
-        virtual void draw(int offsetX, int offsetY);
+        void drawTexture(GameObject* r); 
+        virtual void draw(GameObject* r);
 
     private: 
         std::vector <SDL_Rect> frames;
@@ -85,9 +84,9 @@ class TextObject : public GameObject {
 
         virtual void update();
         void drawTexture();
-        void drawTexture(int offsetX, int offsetY);
+        void drawTexture(GameObject* r);
         virtual void draw();
-        virtual void draw(int offsetX, int offsetY);
+        virtual void draw(GameObject* r);
 
     private:
         TTF_Font *font;
@@ -141,9 +140,9 @@ class GameObjects : public GameObject {
                 gameObjects[i]->draw();
             }
         }
-        virtual void draw(int offsetX, int offsetY) {
+        virtual void draw(GameObject* r) {
             for (int i = 0; i < gameObjectsSize; i++) {
-                gameObjects[i]->draw(offsetX, offsetY);
+                gameObjects[i]->draw(r);
             }
         }
 

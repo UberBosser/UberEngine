@@ -27,15 +27,6 @@ bool GameObject::collideRect(GameObject gameObject) {
         return true;
 }
 
-bool GameObject::collideRectVector(std::vector <GameObject*> rects, int size) {
-    for (int i = 0; i < size; i++) {
-        if (collideRect(*rects[i]) && rects[i] != this) {
-            return true;
-        }
-    }
-    return false;
-}
-
 SDL_Rect* GameObject::getRect() {
     return &rect;
 }
@@ -69,7 +60,7 @@ void GameObject::update() {}
 
 void GameObject::draw() {}
 
-void GameObject::draw(int offsetX, int offsetY) {}
+void GameObject::draw(GameObject* r) {}
 
 GameObject::~GameObject() {}
 
@@ -175,20 +166,22 @@ void SpriteObject::drawTexture() {
     SDL_RenderCopyEx(renderer, texture, &dRect, &rect, angle, &pivot, flip);
 }
 
-void SpriteObject::drawTexture(int offsetX, int offsetY) {
-    offsetRect.x = rect.x - offsetX;
-    offsetRect.y = rect.y - offsetY;
-    offsetRect.w = rect.w;
-    offsetRect.h = rect.h;
-    SDL_RenderCopyEx(renderer, texture, &dRect, &offsetRect, angle, &pivot, flip);
+void SpriteObject::drawTexture(GameObject* r) {
+    if (collideRect(*r)) {
+        offsetRect.x = rect.x - *r->getPosX();
+        offsetRect.y = rect.y - *r->getPosY();
+        offsetRect.w = rect.w;
+        offsetRect.h = rect.h;
+        SDL_RenderCopyEx(renderer, texture, &dRect, &offsetRect, angle, &pivot, flip);
+    }
 }
 
 void SpriteObject::draw() {
     drawTexture();
 }
 
-void SpriteObject::draw(int offsetX, int offsetY) {
-    drawTexture(offsetX, offsetY);
+void SpriteObject::draw(GameObject* r) {
+    drawTexture(r);
 }
 
 
@@ -234,20 +227,22 @@ void TextObject::drawTexture() {
     SDL_RenderCopyEx(renderer, texture, NULL, &rect, angle, &pivot, flip);
 }
 
-void TextObject::drawTexture(int offsetX, int offsetY) {
-    offsetRect.x = rect.x - offsetX;
-    offsetRect.y = rect.y - offsetY;
-    offsetRect.w = rect.w;
-    offsetRect.h = rect.h;
-    SDL_RenderCopyEx(renderer, texture, NULL, &offsetRect, angle, &pivot, flip);
+void TextObject::drawTexture(GameObject* r) {
+    if (collideRect(*r)) {
+            offsetRect.x = rect.x - *r->getPosX();
+            offsetRect.y = rect.y - *r->getPosY();
+            offsetRect.w = rect.w;
+            offsetRect.h = rect.h;
+            SDL_RenderCopyEx(renderer, texture, &dRect, &offsetRect, angle, &pivot, flip);
+        }
 }
 
 void TextObject::draw() {
     drawTexture();
 }
 
-void TextObject::draw(int offsetX, int offsetY) {
-    drawTexture(offsetX, offsetY);
+void TextObject::draw(GameObject* r) {
+    drawTexture(r);
 }
 
 

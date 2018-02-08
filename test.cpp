@@ -1,4 +1,3 @@
-#include <SDL2/SDL_mixer.h>
 #include <iostream>
 #include "uberengine.h"
 #include <time.h>
@@ -101,9 +100,10 @@ class Player : public SpriteObject {
         int shotSpawn;
 };
 
+
 class Background {
     public:
-        Background(GameObject *o) {
+        Background(GameObject* o) {
             backgroundOne = new SpriteObject(o);
             backgroundTwo = new SpriteObject(o);
 
@@ -135,6 +135,7 @@ class Background {
         SpriteObject *backgroundOne;
         SpriteObject *backgroundTwo;
 };
+
 
 class Game : public GameManager {
     public:
