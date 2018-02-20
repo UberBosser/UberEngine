@@ -212,6 +212,15 @@ void TextObject::createSurface(int x, int y, const char *t, int s, const char *f
     SDL_FreeSurface(surface);
 }
 
+void TextObject::updateText(char *t) {
+    surface = TTF_RenderText_Blended(font, t, color);
+    rect = surface->clip_rect;
+    pivot.x = rect.w/2;
+    pivot.y = rect.h/2;
+    texture = SDL_CreateTextureFromSurface(renderer, surface);
+    SDL_FreeSurface(surface); 
+}
+
 void TextObject::updateText(const char *t) {
     surface = TTF_RenderText_Blended(font, t, color);
     rect = surface->clip_rect;
@@ -318,7 +327,7 @@ void MusicManager::play() {
 }
 
 void MusicManager::play(int l) {
-    Mix_PlayMusic(music, -1);
+    Mix_PlayMusic(music, l);
 }
 
 MusicManager::~MusicManager() {

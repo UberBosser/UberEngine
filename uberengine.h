@@ -80,6 +80,7 @@ class TextObject : public GameObject {
 
         void createSurface(int x, int y, const char *t, int s, const char *f);
 
+        void updateText(char *t);
         void updateText(const char *t);
 
         virtual void update();
