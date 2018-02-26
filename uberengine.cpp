@@ -106,6 +106,9 @@ void SpriteObject::createSurface(int x, int y, int w, int h, Uint32 c) {
 
 void SpriteObject::createSurface(int x, int y, const char *i) {
     surface = IMG_Load(i);
+    if (!surface) {
+        printf("Couldn't load image: %s\n", IMG_GetError());
+    }
     rect = surface->clip_rect;
     dRect = surface->clip_rect;
     rect.x = x;
@@ -118,6 +121,9 @@ void SpriteObject::createSurface(int x, int y, const char *i) {
 
 void SpriteObject::createSurface(int x, int y, int w, int h, const char *i) {
     surface = IMG_Load(i);
+    if (!surface) {
+        printf("Couldn't load image: %s\n", IMG_GetError());
+    }
     rect = surface->clip_rect;
     for (int y = 0; y < rect.h/h; y++) {
         for (int x = 0; x < rect.w/w; x++) {
@@ -138,6 +144,9 @@ void SpriteObject::createSurface(int x, int y, int w, int h, const char *i) {
 
 void SpriteObject::createSurface(int x, int y, int w, int h, int f, const char *i) {
     surface = IMG_Load(i);
+    if (!surface) {
+        printf("Couldn't load image: %s\n", IMG_GetError());
+    }
     rect = surface->clip_rect;
     for (int y = 0; y < rect.h/h; y++) {
         for (int x = 0; x < rect.w/w; x++) {
@@ -202,6 +211,9 @@ TextObject::TextObject(GameObject *p) {
 
 void TextObject::createSurface(int x, int y, const char *t, int s, const char *f) {
     font = TTF_OpenFont(f, 24);
+    if (!font) {
+        printf("Couldn't open font: %s\n", TTF_GetError());
+    }
     surface = TTF_RenderText_Blended(font, t, color);
     rect = surface->clip_rect;
     rect.x = x;
@@ -297,11 +309,17 @@ void GameCamera::update() {
 
 SoundManager::SoundManager(const char *d) {
     sound = Mix_LoadWAV(d);
+    if (!sound) {
+        printf("Couldn't load sound: %s\n", Mix_GetError());
+    }
     Mix_VolumeChunk(sound, 64);
 }
 
 SoundManager::SoundManager(const char *d, const int v) {
     sound = Mix_LoadWAV(d);
+    if (!sound) {
+        printf("Couldn't load sound: %s\n", Mix_GetError());
+    }
     Mix_VolumeChunk(sound, v);
 }
 
@@ -320,6 +338,9 @@ SoundManager::~SoundManager() {
 
 MusicManager::MusicManager(const char *d) {
     music = Mix_LoadMUS(d);
+    if (!music) {
+        printf("Couldn't load music: %s\n", Mix_GetError());
+    }
 }
 
 void MusicManager::play() {
@@ -337,6 +358,7 @@ MusicManager::~MusicManager() {
 GameManager::GameManager() {
     quit = false;
     SDL_Init(SDL_INIT_EVERYTHING);
+    IMG_Init(IMG_INIT_PNG | IMG_INIT_JPG);
     TTF_Init();
     window = SDL_CreateWindow("UberEngine", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, 1366, 768, SDL_WINDOW_FULLSCREEN_DESKTOP);
     renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED);
@@ -350,6 +372,7 @@ GameManager::GameManager() {
 GameManager::GameManager(const char* t, int w, int h, Uint32 f) {
     quit = false;
     SDL_Init(SDL_INIT_EVERYTHING);
+    IMG_Init(IMG_INIT_PNG | IMG_INIT_JPG);
     TTF_Init();
     window = SDL_CreateWindow(t, SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, w, h, f);
     renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED);
