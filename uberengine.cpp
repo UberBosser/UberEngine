@@ -363,7 +363,7 @@ GameManager::GameManager() {
     window = SDL_CreateWindow("UberEngine", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, 1366, 768, SDL_WINDOW_FULLSCREEN_DESKTOP);
     renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED);
     screen = SDL_GetWindowSurface(window);
-    Mix_OpenAudio(48000, MIX_DEFAULT_FORMAT, 2, 1536);
+    Mix_OpenAudio(44100, MIX_DEFAULT_FORMAT, 2, 1536);
     screenWidth = 1366;
     screenHeight = 768;
     SDL_SetWindowIcon(window, IMG_Load("Assets/icon.png"));
@@ -377,7 +377,7 @@ GameManager::GameManager(const char* t, int w, int h, Uint32 f) {
     window = SDL_CreateWindow(t, SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, w, h, f);
     renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED);
     screen = SDL_GetWindowSurface(window);
-    Mix_OpenAudio(48000, MIX_DEFAULT_FORMAT, 2, 1536);
+    Mix_OpenAudio(44100, MIX_DEFAULT_FORMAT, 2, 1536);
     screenWidth = w;
     screenHeight = h;
     SDL_SetWindowIcon(window, IMG_Load("Assets/icon.png")); 

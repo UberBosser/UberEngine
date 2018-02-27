@@ -41,7 +41,6 @@ class GameObject {
         SDL_Rect rect;
         SDL_Rect dRect;
         SDL_Rect offsetRect;
-        bool collidable;
         SDL_RendererFlip flip;
         
         GameObject *parent;

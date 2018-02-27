@@ -3,11 +3,40 @@
 #include <time.h>
 
 
+class Explosion : public SpriteObject {
+    public:
+        Explosion(GameObject* o, GameObjects <Explosion>* e, int x, int y) : SpriteObject(o) {
+            createSurface(x, y, 32, 32, "Assets/explosion.png");
+            explosions = e;
+            tick = 0;
+            frame = 0;
+        }
+        void update() {
+            tick++;
+            if (tick % 10 == 0) {
+                if (frame == 2) {
+                    explosions->remove(this);
+                } else {
+                    frame++;
+                    changeFrame(frame);
+                }
+            }
+        }
+
+    private:
+        GameObjects <Explosion>* explosions;
+        int tick;
+        int frame;
+};
+
+
 class Meteor : public SpriteObject {
     public:
-        Meteor(GameObject* o, GameObjects <Meteor>* m, int x) : SpriteObject(o) {
+        Meteor(GameObject* o, GameObjects <Meteor>* m, GameObjects <Explosion>* e, int x) : SpriteObject(o) {
             createSurface(x, -32, "Assets/meteor.png");
+            explosionSound = new SoundManager("Assets/explosion.wav");
             meteors = m;
+            explosions = e;
             speed = rand() % 4 + 1;
         }
         void update() {
@@ -16,10 +45,20 @@ class Meteor : public SpriteObject {
             if (rect.y > 256) {
                 meteors->remove(this);
             }
-        } 
+        }
+        void explode() {
+            explosionSound->play();
+            explosions->add(new Explosion(this, explosions, rect.x, rect.y));
+            meteors->remove(this); 
+        }
+        ~Meteor() {
+            delete explosionSound; 
+        }
 
     private:
+        SoundManager *explosionSound;
         GameObjects <Meteor>* meteors;
+        GameObjects <Explosion>* explosions;
         int speed;
 };
 
@@ -40,7 +79,7 @@ class Bullet : public SpriteObject {
                 GameObject* o = meteors->get(i);
                 if (this->collideRect(*o)) {
                     bullets->remove(this);
-                    meteors->remove(meteors->get(i));
+                    meteors->get(i)->explode();
                 }
             }
         }
@@ -55,7 +94,7 @@ class Player : public SpriteObject {
     public:
         Player(GameManager* o, GameObjects <Meteor>* m) : SpriteObject(o) {
             createSurface(116, 210, 24, 28, "Assets/ship.png");
-            // shootSound = new SoundManager("Assets/laser.wav");
+            shootSound = new SoundManager("Assets/laser.wav");
             meteors = m;
             gameManager = o;
             shotSpawn = 20;
@@ -78,7 +117,7 @@ class Player : public SpriteObject {
                 changeFrame(1);
                 if (keys[SDL_SCANCODE_SPACE]) {
                     bullets.add(new Bullet(this, meteors, &bullets, rect.x + 11));
-                    // shootSound->play();
+                    shootSound->play();
                     shotSpawn = 0;
                 }
             } else if (shotSpawn < 20) {
@@ -95,7 +134,7 @@ class Player : public SpriteObject {
     private:
         GameObjects <Bullet> bullets;
         GameObjects <Meteor>* meteors;
-        // SoundManager *shootSound;
+        SoundManager *shootSound;
         GameManager* gameManager;
         int shotSpawn;
 };
@@ -151,6 +190,7 @@ class Game : public GameManager {
             background->update();
             player->update();
             meteors.update();
+            explosions.update();
             for (int i = 0; i < meteors.getObjectsSize(); i ++) {
                 GameObject* o = meteors.get(i);
                 if (player->collideRect(*o)) {
@@ -158,7 +198,7 @@ class Game : public GameManager {
                 }
             }
             if (meteorSpawn % 20 == 0) {
-                meteors.add(new Meteor(this, &meteors, rand() % 256 - 16)); 
+                meteors.add(new Meteor(this, &meteors, &explosions, rand() % 256 - 16)); 
                 meteorSpawn = 0;
             }
             meteorSpawn++;
@@ -166,6 +206,7 @@ class Game : public GameManager {
         void draw() {
             background->draw();
             player->draw();
+            explosions.draw();
             meteors.draw();
         }
         ~Game() {
@@ -178,6 +219,7 @@ class Game : public GameManager {
         Background* background;
         Player* player;
         GameObjects <Meteor> meteors;
+        GameObjects <Explosion> explosions;
         MusicManager *music;
         int meteorSpawn;
 };
