@@ -2,9 +2,28 @@
 #include <SDL2/SDL_image.h>
 #include <SDL2/SDL_ttf.h>
 #include <SDL2/SDL_mixer.h>
+#include <Box2D/Box2D.h>
+#include <math.h>
 #include <iostream>
 #include <vector>
 #include "uberengine.h"
+
+
+bool collideRect(SDL_Rect* a, SDL_Rect* b) {
+    if (a->y + a->h <= b->y) {
+            return false;
+        }
+        if (a->y >= b->y + b->h) {
+            return false; 
+        }
+        if (a->x + a->w <= b->x) {
+            return false;
+        }
+        if (a->x >= b->x + b->w) {
+            return false; 
+        }
+        return true;
+}
 
 
 bool GameObject::operator==(const GameObject *gameObject) const {
@@ -56,6 +75,17 @@ SDL_Renderer* GameObject::getRenderer() {
     return renderer;
 }
 
+b2World* GameObject::getWorld() {
+    return world;
+}
+
+void GameObject::updates() {
+    updatePhysics();
+    update();
+}
+
+void GameObject::updatePhysics() {}
+
 void GameObject::update() {}
 
 void GameObject::draw() {}
@@ -65,46 +95,13 @@ void GameObject::draw(GameObject* r) {}
 GameObject::~GameObject() {}
 
 
-SpriteObject::SpriteObject(SDL_Renderer *r) {
-    renderer = r;
+SpriteObject::SpriteObject(GameInfo* g) {
+    gameInfo = g;
     flip = SDL_FLIP_NONE;
     angle = 0;
 }
 
-SpriteObject::SpriteObject(GameObject *p) {
-    parent = p;
-    renderer = parent->getRenderer();
-    flip = SDL_FLIP_NONE;
-    angle = 0;
-}
-
-void SpriteObject::createSurface(int x, int y, int w, int h) {
-    surface = SDL_CreateRGBSurface(0, w, h, 32, 0, 0, 0, 0);
-    rect = surface->clip_rect;
-    dRect = surface->clip_rect;
-    rect.x = x;
-    rect.y = y;
-    pivot.x = rect.w/2;
-    pivot.y = rect.h/2;
-    SDL_FillRect(surface, NULL, SDL_MapRGB(surface->format, 255, 255, 255));
-    texture = SDL_CreateTextureFromSurface(renderer, surface);
-    SDL_FreeSurface(surface);
-}
-
-void SpriteObject::createSurface(int x, int y, int w, int h, Uint32 c) {
-    surface = SDL_CreateRGBSurface(0, w, h, 32, 0, 0, 0, 0);
-    rect = surface->clip_rect;
-    dRect = surface->clip_rect;
-    rect.x = x;
-    rect.y = y;
-    pivot.x = rect.w/2;
-    pivot.y = rect.h/2;
-    SDL_FillRect(surface, NULL, c);
-    texture = SDL_CreateTextureFromSurface(renderer, surface);
-    SDL_FreeSurface(surface); 
-}
-
-void SpriteObject::createSurface(int x, int y, const char *i) {
+void SpriteObject::loadImage(int x, int y, const char* i) {
     surface = IMG_Load(i);
     if (!surface) {
         printf("Couldn't load image: %s\n", IMG_GetError());
@@ -114,12 +111,13 @@ void SpriteObject::createSurface(int x, int y, const char *i) {
     rect.x = x;
     rect.y = y;
     pivot.x = rect.w/2;
-    pivot.y = rect.h/2;
-    texture = SDL_CreateTextureFromSurface(renderer, surface);
+    pivot.y = rect.h/2; 
+    SDL_SetHint( SDL_HINT_RENDER_SCALE_QUALITY, "1");
+    texture = SDL_CreateTextureFromSurface(gameInfo->renderer, surface);
     SDL_FreeSurface(surface);
 }
 
-void SpriteObject::createSurface(int x, int y, int w, int h, const char *i) {
+void SpriteObject::loadImage(int x, int y, int w, int h, const char* i) {
     surface = IMG_Load(i);
     if (!surface) {
         printf("Couldn't load image: %s\n", IMG_GetError());
@@ -138,12 +136,28 @@ void SpriteObject::createSurface(int x, int y, int w, int h, const char *i) {
     rect.y = y;
     pivot.x = dRect.w/2;
     pivot.y = dRect.h/2;
-    texture = SDL_CreateTextureFromSurface(renderer, surface);
+    SDL_SetHint( SDL_HINT_RENDER_SCALE_QUALITY, "1");
+    texture = SDL_CreateTextureFromSurface(gameInfo->renderer, surface);
     SDL_FreeSurface(surface);
 }
 
-void SpriteObject::createSurface(int x, int y, int w, int h, int f, const char *i) {
-    surface = IMG_Load(i);
+void SpriteObject::loadImage(int x, int y, SDL_Surface* i) {
+    surface = i;
+    if (!surface) {
+        printf("Couldn't load image: %s\n", IMG_GetError());
+    }
+    rect = surface->clip_rect;
+    dRect = surface->clip_rect;
+    rect.x = x;
+    rect.y = y;
+    pivot.x = rect.w/2;
+    pivot.y = rect.h/2;
+    SDL_SetHint( SDL_HINT_RENDER_SCALE_QUALITY, "1");
+    texture = SDL_CreateTextureFromSurface(gameInfo->renderer, surface);
+}
+
+void SpriteObject::loadImage(int x, int y, int w, int h, SDL_Surface* i) {
+    surface = i;
     if (!surface) {
         printf("Couldn't load image: %s\n", IMG_GetError());
     }
@@ -154,43 +168,161 @@ void SpriteObject::createSurface(int x, int y, int w, int h, int f, const char *
             frames.push_back(r);
         }
     }
-    dRect = frames[f];
+    dRect = frames[0];
     rect.w = w;
     rect.h = h;
     rect.x = x;
     rect.y = y;
     pivot.x = dRect.w/2;
     pivot.y = dRect.h/2;
-    texture = SDL_CreateTextureFromSurface(renderer, surface);
-    SDL_FreeSurface(surface);
+    SDL_SetHint( SDL_HINT_RENDER_SCALE_QUALITY, "1");
+    texture = SDL_CreateTextureFromSurface(gameInfo->renderer, surface);
 }
 
-void SpriteObject::changeFrame(int i) {
+void SpriteObject::changeFrame(int i) { 
     dRect = frames[i];
 }
 
 void SpriteObject::update() {}
 
-void SpriteObject::drawTexture() {
-    SDL_RenderCopyEx(renderer, texture, &dRect, &rect, angle, &pivot, flip);
-}
-
-void SpriteObject::drawTexture(GameObject* r) {
-    if (collideRect(*r)) {
-        offsetRect.x = rect.x - *r->getPosX();
-        offsetRect.y = rect.y - *r->getPosY();
-        offsetRect.w = rect.w;
-        offsetRect.h = rect.h;
-        SDL_RenderCopyEx(renderer, texture, &dRect, &offsetRect, angle, &pivot, flip);
-    }
-}
-
 void SpriteObject::draw() {
     drawTexture();
 }
 
-void SpriteObject::draw(GameObject* r) {
-    drawTexture(r);
+void SpriteObject::drawTexture() {
+    if (!collideRect(&rect, &gameInfo->screenRect)) {
+        SDL_RenderCopyEx(gameInfo->renderer, texture, &dRect, &rect, angle, &pivot, flip);
+    }
+}
+
+SpriteObject::~SpriteObject() {
+    SDL_DestroyTexture(texture);
+}
+
+
+RigidBody::RigidBody(GameInfo* g) : SpriteObject(g){
+    b2BodyDef bodyDef;
+    bodyDef.type = b2_staticBody;
+    bodyDef.angle = 0.0f; 
+    body = gameInfo->world->CreateBody(&bodyDef);
+    body->SetUserData(this);
+}
+
+void RigidBody::collisionStart() {}
+
+void RigidBody::collisionEnd() {}
+
+RigidBody::~RigidBody() { 
+    body->GetWorld()->DestroyBody(body);
+}
+
+
+StaticBody::StaticBody(GameInfo* g) : RigidBody(g) {
+   body->SetType(b2_staticBody);
+}
+
+void StaticBody::boxFixture() {
+    b2PolygonShape boxShape;
+    boxShape.SetAsBox((dRect.w * 0.01f)/2.0f - 0.01f, (dRect.h * 0.01f)/2.0f - 0.01f);
+    b2FixtureDef boxFixtureDef;
+    boxFixtureDef.shape = &boxShape;
+
+    body->CreateFixture(&boxFixtureDef);
+
+    setPosition(rect.x * 0.01f, rect.y * 0.01f);
+}
+
+void StaticBody::circleFixture() {
+    b2CircleShape circleShape;
+    circleShape.m_radius = (dRect.w/2 + dRect.h/2)/2 * 0.01;
+
+    b2FixtureDef circleFixtureDef;
+    circleFixtureDef.shape = &circleShape;
+
+    body->CreateFixture(&circleFixtureDef);
+    
+    setPosition(rect.x * 0.01f, rect.y * 0.01f);
+}
+
+void StaticBody::setPosition(float x, float y) {
+    body->SetTransform(b2Vec2(x + (dRect.w * 0.01f)/2.0f, y + (dRect.h * 0.01f)/2.0f), body->GetAngle());
+}
+
+
+DynamicBody::DynamicBody(GameInfo* g) : RigidBody(g){
+    body->SetType(b2_dynamicBody);    
+}
+
+void DynamicBody::boxFixture() {
+    b2PolygonShape boxShape;
+    boxShape.SetAsBox((dRect.w * 0.01f)/2.0f - 0.01f, (dRect.h * 0.01f)/2.0f - 0.01f);
+    b2FixtureDef boxFixtureDef;
+    boxFixtureDef.shape = &boxShape;
+    boxFixtureDef.density = 1;
+    boxFixtureDef.restitution = 0.3;
+
+    body->CreateFixture(&boxFixtureDef);
+    
+    setPosition(rect.x * 0.01f, rect.y * 0.01f); 
+}
+
+void DynamicBody::circleFixture() {
+    b2CircleShape circleShape;
+    circleShape.m_radius = (dRect.w/2 + dRect.h/2)/2 * 0.01;
+
+    b2FixtureDef circleFixtureDef;
+    circleFixtureDef.shape = &circleShape;
+    circleFixtureDef.density = 1;
+    circleFixtureDef.restitution = 0.3;
+
+    body->CreateFixture(&circleFixtureDef);
+    
+    setPosition(rect.x * 0.01f, rect.y * 0.01f);
+}
+
+void DynamicBody::setPosition(float x, float y) {
+    body->SetTransform(b2Vec2(x + (dRect.w * 0.01f)/2.0f, y + (dRect.h * 0.01f)/2.0f), body->GetAngle());
+}
+
+void DynamicBody::setVelocity(int x, int y) {
+    // Fix int to box2d meters.
+    body->SetLinearVelocity(b2Vec2(x, y));
+}
+
+void DynamicBody::update() {
+    updatePhysics();
+}
+
+void DynamicBody::updatePhysics() {
+    b2Vec2 pos = body->GetPosition();
+    rect.x = (pos.x - (dRect.w * 0.01f)/2.0f) * 100;
+    rect.y = (pos.y - (dRect.h * 0.01f)/2.0f) * 100;
+    angle = body->GetAngle() * RADTODEG;
+}
+
+
+void ContactListener::BeginContact(b2Contact* contact) {
+    void* rigidBody = contact->GetFixtureA()->GetBody()->GetUserData();
+    if (rigidBody) {
+        static_cast<RigidBody*>(rigidBody)->collisionStart();
+    }
+
+    rigidBody = contact->GetFixtureB()->GetBody()->GetUserData();
+    if (rigidBody) {
+        static_cast<RigidBody*>(rigidBody)->collisionStart();
+    }
+}
+
+void ContactListener::EndContact(b2Contact* contact) {
+    void* rigidBody = contact->GetFixtureA()->GetBody()->GetUserData();
+    if (rigidBody) {
+        static_cast<RigidBody*>(rigidBody)->collisionEnd();
+    }
+
+    rigidBody = contact->GetFixtureB()->GetBody()->GetUserData();
+    if (rigidBody) {
+        static_cast<RigidBody*>(rigidBody)->collisionEnd();
+    }
 }
 
 
@@ -315,7 +447,7 @@ SoundManager::SoundManager(const char *d) {
     Mix_VolumeChunk(sound, 64);
 }
 
-SoundManager::SoundManager(const char *d, const int v) {
+SoundManager::SoundManager(const char* d, const int v) {
     sound = Mix_LoadWAV(d);
     if (!sound) {
         printf("Couldn't load sound: %s\n", Mix_GetError());
@@ -336,7 +468,7 @@ SoundManager::~SoundManager() {
 }
 
 
-MusicManager::MusicManager(const char *d) {
+MusicManager::MusicManager(const char* d) {
     music = Mix_LoadMUS(d);
     if (!music) {
         printf("Couldn't load music: %s\n", Mix_GetError());
@@ -355,40 +487,57 @@ MusicManager::~MusicManager() {
     Mix_FreeMusic(music);
 }
 
+
 GameManager::GameManager() {
     quit = false;
     SDL_Init(SDL_INIT_EVERYTHING);
     IMG_Init(IMG_INIT_PNG | IMG_INIT_JPG);
+    Mix_Init(MIX_INIT_MP3);
     TTF_Init();
     window = SDL_CreateWindow("UberEngine", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, 1366, 768, SDL_WINDOW_FULLSCREEN_DESKTOP);
-    renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED);
+    gameInfo.renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED);
     screen = SDL_GetWindowSurface(window);
     Mix_OpenAudio(44100, MIX_DEFAULT_FORMAT, 2, 1536);
-    screenWidth = 1366;
-    screenHeight = 768;
+    gameInfo.screenRect.w = 1366;
+    gameInfo.screenRect.h = 768;
     SDL_SetWindowIcon(window, IMG_Load("Assets/icon.png"));
+
+    b2Vec2 gravity(0.0f, 9.8f);
+    gameInfo.world = new b2World(gravity);
+
+    gameInfo.world->SetContactListener(&contactListener);
 }
 
 GameManager::GameManager(const char* t, int w, int h, Uint32 f) {
     quit = false;
     SDL_Init(SDL_INIT_EVERYTHING);
-    IMG_Init(IMG_INIT_PNG | IMG_INIT_JPG);
+    IMG_Init(IMG_INIT_PNG | IMG_INIT_JPG); 
+    Mix_Init(MIX_INIT_MP3);
     TTF_Init();
     window = SDL_CreateWindow(t, SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, w, h, f);
-    renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED);
+    gameInfo.renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED);
     screen = SDL_GetWindowSurface(window);
     Mix_OpenAudio(44100, MIX_DEFAULT_FORMAT, 2, 1536);
-    screenWidth = w;
-    screenHeight = h;
-    SDL_SetWindowIcon(window, IMG_Load("Assets/icon.png")); 
+    gameInfo.screenRect.w = w;
+    gameInfo.screenRect.h = h;
+    SDL_SetWindowIcon(window, IMG_Load("Assets/icon.png"));
+
+    b2Vec2 gravity(0.0f, 9.8f);
+    gameInfo.world = new b2World(gravity);
+    
+    gameInfo.world->SetContactListener(&contactListener);
+}
+
+GameInfo* GameManager::getGameInfo() {
+    return &gameInfo;
 }
 
 int GameManager::getScreenWidth() {
-    return screenWidth;
+    return gameInfo.screenRect.w;
 }
 
 int GameManager::getScreenHeight() {
-    return screenHeight;
+    return gameInfo.screenRect.h;
 }
 
 void GameManager::setQuit(bool q) {
@@ -421,17 +570,22 @@ void GameManager::capFps() {
 void GameManager::loop() {
     while (!quit) {
         startTick = SDL_GetTicks();
+        gameInfo.world->Step(1.0f/60.0f, 6, 2);
         events();
         update();
-        SDL_RenderClear(renderer);
+        SDL_RenderClear(gameInfo.renderer);
         draw();
-        SDL_RenderPresent(renderer);
+        SDL_RenderPresent(gameInfo.renderer);
         capFps();
     }
     SDL_FreeSurface(screen);
-    SDL_DestroyRenderer(renderer);
+    SDL_DestroyRenderer(gameInfo.renderer);
     SDL_DestroyWindow(window);
     Mix_Quit();
     IMG_Quit();
     SDL_Quit();
+}
+
+GameManager::~GameManager() {
+    delete gameInfo.world;
 }
