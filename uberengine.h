@@ -88,15 +88,12 @@ class SpriteObject {
 
         virtual void update();
 
- //       virtual void startContact();
- //       virtual void endContact();
-
         virtual void draw();
         void drawTexture();
-        
-        // Camera... 
-        // void drawTexture(GameObject* r); 
-        // virtual void draw(GameObject* r);
+
+        // Camera/Offset 
+        void drawTexture(SpriteObject* r); 
+        virtual void draw(SpriteObject* r);
 
         virtual ~SpriteObject();
 
@@ -244,11 +241,11 @@ class GameObjects {
                 gameObjects[i]->draw();
             }
         }
-        //virtual void draw(GameObject* r) {
-        //    for (int i = 0; i < gameObjectsSize; i++) {
-        //        gameObjects[i]->draw(r);
-        //    }
-        //}
+        virtual void draw(SpriteObject* r) {
+            for (int i = 0; i < gameObjectsSize; i++) {
+                gameObjects[i]->draw(r);
+            }
+        }
 
         ~GameObjects() {
             
@@ -265,14 +262,14 @@ class GameCamera : public GameObject {
     public:
        GameCamera(int w, int h);
 
-       void setTarget(GameObject *gameObject);
+       void setTarget(SpriteObject* t);
        void setSize(int w, int h);
        void setMaximumBounds(int w, int h);
 
        virtual void update();
 
     private:
-       GameObject* target;
+       SpriteObject* target;
        bool maxBounds;
        int maxW, maxH;
 };
