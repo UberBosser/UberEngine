@@ -4,7 +4,22 @@
 #include <SDL2/SDL_image.h>
 #include <SDL2/SDL_ttf.h>
 #include <SDL2/SDL_mixer.h>
+#include <Box2D/Box2D.h>
 #include <vector>
+
+
+#define DEGTORAD 0.0174532925199432957f
+#define RADTODEG 57.295779513082320876f
+
+
+// Game information, passed down to pretty much everything.
+struct GameInfo {
+    SDL_Renderer* renderer;
+    b2World* world;
+    SDL_Rect screenRect;
+};
+
+bool collideRect(SDL_Rect* a, SDL_Rect* b);
 
 
 class GameObject {
@@ -24,8 +39,12 @@ class GameObject {
         void changePosition(int x, int y);
 
         SDL_Renderer* getRenderer();
+        b2World* getWorld();
+        
+        virtual void updates();
+        virtual void updatePhysics();
+        virtual void update();
 
-        virtual void update(); 
         virtual void draw();
         virtual void draw(GameObject* r);
 
@@ -40,34 +59,119 @@ class GameObject {
         SDL_Point pivot;
         SDL_Rect rect;
         SDL_Rect dRect;
+        b2Body *body;
+        b2BodyDef bodyDef;
         SDL_Rect offsetRect;
         SDL_RendererFlip flip;
         
         GameObject *parent;
+        b2World* world;
 };
 
 
-class SpriteObject : public GameObject {
-    // SpriteObjects are drawable Sprites, they can load images or make rectangles.
+class SpriteObject {
+    // Dynamic physics object, has a mass, reacts to collisions.
     public:
-        SpriteObject(SDL_Renderer *r);
-        SpriteObject(GameObject *p); 
+        SpriteObject(GameInfo* g); 
+       
+        void loadImage(int x, int y, const char* i);
+        // SpriteSheet...
+        void loadImage(int x, int y, int w, int h, const char* i);
+        
+        // If image is loaded this way don't forget to call SDL_FreeSurface(surface);.
+        void loadImage(int x, int y, SDL_Surface* i);
+        void loadImage(int x, int y, int w, int h, SDL_Surface* i);
 
-        void createSurface(int x, int y, int w, int h);
-        void createSurface(int x, int y, int w, int h, Uint32 c);
-        void createSurface(int x, int y, const char *i);
-        void createSurface(int x, int y, int w, int h, const char *i);
-        void createSurface(int x, int y, int w, int h, int f, const char *i);
-        void changeFrame(int i);
+        SDL_Rect* getRect();
+        int getPosX();
+        int getPosY();
+
+        // Change frame of animation.
+        void changeFrame(int i);        
+
         virtual void update();
-        virtual void draw();
-        // Offset is usually for the CameraObject.
-        void drawTexture();
-        void drawTexture(GameObject* r); 
-        virtual void draw(GameObject* r);
 
-    private: 
+        virtual void draw();
+        void drawTexture();
+
+        // Camera/Offset 
+        void drawTexture(SpriteObject* c); 
+        virtual void draw(SpriteObject* c);
+
+        virtual ~SpriteObject();
+
+    protected:
+        GameInfo* gameInfo;
+
+        SDL_Rect rect;
+        SDL_Rect dRect;
+        float angle;
+
+    private:
+        SDL_Surface* surface;
+        SDL_Texture* texture;
+        SDL_Point pivot;
+        SDL_RendererFlip flip;
+        SDL_Rect offsetRect;
+
         std::vector <SDL_Rect> frames;
+};
+
+
+class RigidBody : public SpriteObject {
+    public:
+        RigidBody(GameInfo* g);
+
+        virtual void collisionStart();
+        virtual void collisionEnd();
+
+        virtual ~RigidBody();
+
+    protected:
+        b2Body* body;
+};
+
+
+class StaticBody : public RigidBody {
+    // Doesn't move unless told to.
+    public:
+        StaticBody(GameInfo* g);
+
+        // Creates a box fixture, using the loaded image size.
+        void boxFixture();
+        // Creates a circleFixture, using the loaded image size.
+        void circleFixture();
+
+        void setPosition(float x, float y);
+};
+
+
+class DynamicBody : public RigidBody {
+    // Reacts to physics.
+    public:
+        DynamicBody(GameInfo* g);
+
+        // Creates a box fixture, using the loaded image size.
+        void boxFixture();
+        // Creates a circleFixture, using the loaded image size.
+        void circleFixture();
+
+        void setPosition(float x, float y);
+        
+        b2Vec2 getVelocity();
+        void setVelocity(int x, int y);
+
+        virtual void update();
+        void updatePhysics();
+};
+
+
+class ContactListener : public b2ContactListener {
+    // Call RigidBody's collisionStart().
+    void BeginContact(b2Contact* contact);
+    
+    // Call RigidBody's collisionEnd().
+    void EndContact(b2Contact* contact);
 };
 
 
@@ -97,7 +201,7 @@ class TextObject : public GameObject {
 
 
 template <class object>
-class GameObjects : public GameObject {
+class GameObjects {
     // A group of GameObjects and their children, provides an easy way to manage multiple GameObjects.
     public:
         GameObjects() {
@@ -140,15 +244,13 @@ class GameObjects : public GameObject {
                 gameObjects[i]->draw();
             }
         }
-        virtual void draw(GameObject* r) {
+        virtual void draw(SpriteObject* r) {
             for (int i = 0; i < gameObjectsSize; i++) {
                 gameObjects[i]->draw(r);
             }
         }
 
-        ~GameObjects() {
-            
-        }
+        ~GameObjects() {}
 
     private:
         std::vector <object*> gameObjects;
@@ -156,40 +258,40 @@ class GameObjects : public GameObject {
 };
 
 
-class GameCamera : public GameObject {
+class GameCamera : public SpriteObject {
     // GameCamera for when you want to follow a GameObject around.
     public:
-       GameCamera(int w, int h);
+       GameCamera(GameInfo* g, int w, int h);
 
-       void setTarget(GameObject *gameObject);
+       void setTarget(SpriteObject* t);
        void setSize(int w, int h);
        void setMaximumBounds(int w, int h);
 
        virtual void update();
 
     private:
-       GameObject *target;
+       SpriteObject* target;
        bool maxBounds;
        int maxW, maxH;
 };
 
 
-class SoundManager : public GameObject {
+class SoundManager {
     public:
-        SoundManager(const char *d);
-        SoundManager(const char *d, const int v);
+        SoundManager(const char* d);
+        SoundManager(const char* d, const int v);
         void play();
         void play(int i);
         ~SoundManager();
 
     private:
-        Mix_Chunk *sound;
+        Mix_Chunk* sound;
 };
 
 
-class MusicManager : public GameObject {
+class MusicManager {
     public:
-        MusicManager(const char *d);
+        MusicManager(const char* d);
         void play();
         void play(int t);
         ~MusicManager();
@@ -199,12 +301,13 @@ class MusicManager : public GameObject {
 };
 
 
-class GameManager : public GameObject {
+class GameManager {
     // Includes window, screen creation and game loop.
     public:
         GameManager();
         GameManager(const char* t, int w, int h, Uint32 f);
 
+        GameInfo* getGameInfo();
         int getScreenWidth();
         int getScreenHeight();
 
@@ -215,16 +318,20 @@ class GameManager : public GameObject {
         virtual void draw();
         void capFps();
         void loop();
-    
-    protected:
-        SDL_Window *window;
-        SDL_Surface *screen;
 
-    private: 
+        ~GameManager();
+    
+    protected: 
+        SDL_Window* window;
+        SDL_Surface* screen;
+
+    private:
+        GameInfo gameInfo;
         Uint32 startTick;
         SDL_Event event;
         bool quit;
-        int screenWidth, screenHeight;
+
+        ContactListener contactListener;
 };
 
 #endif

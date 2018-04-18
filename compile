@@ -1,6 +1,6 @@
 #! /bin/bash
 echo compiling...
-clang++ test.cpp uberengine.cpp \
+clang++ phyTest.cpp uberengine.cpp \
     -o game.o \
     -DDEBUG \
     -O0 \
@@ -8,4 +8,5 @@ clang++ test.cpp uberengine.cpp \
     -lSDL2_image \
     -lSDL2_ttf \
     -lSDL2_mixer \
+    -lBox2D \
    && ./game.o
