@@ -179,6 +179,18 @@ void SpriteObject::loadImage(int x, int y, int w, int h, SDL_Surface* i) {
     texture = SDL_CreateTextureFromSurface(gameInfo->renderer, surface);
 }
 
+SDL_Rect* SpriteObject::getRect() {
+    return &rect;
+}
+
+int SpriteObject::getPosX() {
+    return rect.x;
+}
+
+int SpriteObject::getPosY() {
+    return rect.y;
+}
+
 void SpriteObject::changeFrame(int i) { 
     dRect = frames[i];
 }
@@ -192,6 +204,21 @@ void SpriteObject::draw() {
 void SpriteObject::drawTexture() {
     if (!collideRect(&rect, &gameInfo->screenRect)) {
         SDL_RenderCopyEx(gameInfo->renderer, texture, &dRect, &rect, angle, &pivot, flip);
+    }
+}
+
+void SpriteObject::draw(SpriteObject* c) {
+    drawTexture(c);
+}
+
+void SpriteObject::drawTexture(SpriteObject* c) {
+    // Set offset
+    if (collideRect(&rect, c->getRect())) {
+        offsetRect.x = rect.x - c->getPosX();
+        offsetRect.y = rect.y - c->getPosY();
+        offsetRect.w = rect.w;
+        offsetRect.h = rect.h;
+        SDL_RenderCopyEx(gameInfo->renderer, texture, &dRect, &offsetRect, angle, &pivot, flip);
     }
 }
 
@@ -399,13 +426,14 @@ void TextObject::draw(GameObject* r) {
 }
 
 
-GameCamera::GameCamera(int w, int h) {
+GameCamera::GameCamera(GameInfo* g, int w, int h) : SpriteObject(g) {
     rect.w = w;
     rect.h = h;
+    maxBounds = false;
 }
 
-void GameCamera::setTarget(GameObject *gameObject) {
-    target = gameObject;
+void GameCamera::setTarget(SpriteObject* t) {
+    target = t;
 }
 
 void GameCamera::setSize(int w, int h) {
@@ -438,6 +466,7 @@ void GameCamera::update() {
         }
     }
 }
+
 
 SoundManager::SoundManager(const char *d) {
     sound = Mix_LoadWAV(d);

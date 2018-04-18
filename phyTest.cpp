@@ -94,6 +94,7 @@ class Player : public DynamicBody {
 class Game : public GameManager {
     public:
         Game() : GameManager("Physics Test", 512, 512, 0){
+            camera = new GameCamera(getGameInfo(), 512, 512);
             music = new MusicManager("Assets/music.wav");
             // music->play();
             boxDeathSound = new SoundManager("Assets/knock.wav", 128);
@@ -104,18 +105,20 @@ class Game : public GameManager {
                 }
             }
             p = new Player(getGameInfo());
+            camera->setTarget(p);
         }
 
         void update() {
             f->update();
             boxes.update();
             p->update();
+            camera->update();
         }
 
         void draw() {
-            f->draw();
-            boxes.draw();
-            p->draw();
+            f->draw(camera);
+            boxes.draw(camera);
+            p->draw(camera);
         }
 
         ~Game() {
@@ -123,6 +126,7 @@ class Game : public GameManager {
             delete boxDeathSound;
             delete f; 
             delete p;
+            delete camera;
         }
     
     private:
@@ -131,6 +135,7 @@ class Game : public GameManager {
         GameObjects <Box> boxes;
         Floor* f;
         Player* p;
+        GameCamera* camera;
 };
 
 int main() {

@@ -82,7 +82,10 @@ class SpriteObject {
         void loadImage(int x, int y, SDL_Surface* i);
         void loadImage(int x, int y, int w, int h, SDL_Surface* i);
 
- 
+        SDL_Rect* getRect();
+        int getPosX();
+        int getPosY();
+
         // Change frame of animation.
         void changeFrame(int i);        
 
@@ -92,8 +95,8 @@ class SpriteObject {
         void drawTexture();
 
         // Camera/Offset 
-        void drawTexture(SpriteObject* r); 
-        virtual void draw(SpriteObject* r);
+        void drawTexture(SpriteObject* c); 
+        virtual void draw(SpriteObject* c);
 
         virtual ~SpriteObject();
 
@@ -247,9 +250,7 @@ class GameObjects {
             }
         }
 
-        ~GameObjects() {
-            
-        }
+        ~GameObjects() {}
 
     private:
         std::vector <object*> gameObjects;
@@ -257,10 +258,10 @@ class GameObjects {
 };
 
 
-class GameCamera : public GameObject {
+class GameCamera : public SpriteObject {
     // GameCamera for when you want to follow a GameObject around.
     public:
-       GameCamera(int w, int h);
+       GameCamera(GameInfo* g, int w, int h);
 
        void setTarget(SpriteObject* t);
        void setSize(int w, int h);
