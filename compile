@@ -1,12 +1,11 @@
 #! /bin/bash
 echo compiling...
-g++ $1 uberengine.cpp \
+g++ $1 UE_core.cpp UE_utils.cpp \
     -o game.o \
     -DDEBUG \
     -O0 \
     $(sdl2-config --libs --cflags) \
     -lSDL2_image \
-    -lSDL2_ttf \
     -lSDL2_mixer \
     -lBox2D \
    && ./game.o
