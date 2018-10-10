@@ -1,6 +1,6 @@
 #! /bin/bash
 echo compiling...
-clang++ phyTest.cpp uberengine.cpp \
+g++ $1 uberengine.cpp \
     -o game.o \
     -DDEBUG \
     -O0 \

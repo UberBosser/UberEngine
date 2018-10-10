@@ -1,6 +1,5 @@
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_image.h>
-#include <SDL2/SDL_ttf.h>
 #include <SDL2/SDL_mixer.h>
 #include <Box2D/Box2D.h>
 #include <math.h>
@@ -24,75 +23,6 @@ bool collideRect(SDL_Rect* a, SDL_Rect* b) {
         }
         return true;
 }
-
-
-bool GameObject::operator==(const GameObject *gameObject) const {
-    return (this == gameObject);
-}
-
-bool GameObject::collideRect(GameObject gameObject) {
-        if (rect.y + rect.h <= gameObject.rect.y) {
-            return false;
-        }
-        if (rect.y >= gameObject.rect.y + gameObject.rect.h) {
-            return false; 
-        }
-        if (rect.x + rect.w <= gameObject.rect.x) {
-            return false;
-        }
-        if (rect.x >= gameObject.rect.x + gameObject.rect.w) {
-            return false; 
-        }
-        return true;
-}
-
-SDL_Rect* GameObject::getRect() {
-    return &rect;
-}
-
-int* GameObject::getPosX() {
-    return &rect.x;
-}
-
-int* GameObject::getPosY() {
-    return &rect.y;
-}
-
-int* GameObject::getWidth() {
-    return &rect.w;
-}
-
-int* GameObject::getHeight() {
-    return &rect.h;
-}
-
-void GameObject::changePosition(int x, int y) {
-    rect.x += x;
-    rect.y += y;
-}
-
-SDL_Renderer* GameObject::getRenderer() {
-    return renderer;
-}
-
-b2World* GameObject::getWorld() {
-    return world;
-}
-
-void GameObject::updates() {
-    updatePhysics();
-    update();
-}
-
-void GameObject::updatePhysics() {}
-
-void GameObject::update() {}
-
-void GameObject::draw() {}
-
-void GameObject::draw(GameObject* r) {}
-
-GameObject::~GameObject() {}
 
 
 SpriteObject::SpriteObject(GameInfo* g) {
@@ -202,7 +132,7 @@ void SpriteObject::draw() {
 }
 
 void SpriteObject::drawTexture() {
-    if (!collideRect(&rect, &gameInfo->screenRect)) {
+    if (collideRect(&rect, &gameInfo->screenRect)) {
         SDL_RenderCopyEx(gameInfo->renderer, texture, &dRect, &rect, angle, &pivot, flip);
     }
 }
@@ -351,80 +281,6 @@ void ContactListener::EndContact(b2Contact* contact) {
         static_cast<RigidBody*>(rigidBody)->collisionEnd();
     }
 }
-
-
-TextObject::TextObject(SDL_Renderer *r) {
-    renderer = r;
-    color.r = 255;
-    color.g = 255;
-    color.b = 255;
-}
-
-TextObject::TextObject(GameObject *p) {
-    parent = p;
-    renderer = parent->getRenderer();
-    color.r = 255;
-    color.g = 255;
-    color.b = 255;
-}
-
-void TextObject::createSurface(int x, int y, const char *t, int s, const char *f) {
-    font = TTF_OpenFont(f, 24);
-    if (!font) {
-        printf("Couldn't open font: %s\n", TTF_GetError());
-    }
-    surface = TTF_RenderText_Blended(font, t, color);
-    rect = surface->clip_rect;
-    rect.x = x;
-    rect.y = y;
-    pivot.x = rect.w/2;
-    pivot.y = rect.h/2;
-    texture = SDL_CreateTextureFromSurface(renderer, surface);
-    SDL_FreeSurface(surface);
-}
-
-void TextObject::updateText(char *t) {
-    surface = TTF_RenderText_Blended(font, t, color);
-    rect = surface->clip_rect;
-    pivot.x = rect.w/2;
-    pivot.y = rect.h/2;
-    texture = SDL_CreateTextureFromSurface(renderer, surface);
-    SDL_FreeSurface(surface); 
-}
-
-void TextObject::updateText(const char *t) {
-    surface = TTF_RenderText_Blended(font, t, color);
-    rect = surface->clip_rect;
-    pivot.x = rect.w/2;
-    pivot.y = rect.h/2;
-    texture = SDL_CreateTextureFromSurface(renderer, surface);
-    SDL_FreeSurface(surface); 
-}
-
-void TextObject::update() {}
-
-void TextObject::drawTexture() {
-    SDL_RenderCopyEx(renderer, texture, NULL, &rect, angle, &pivot, flip);
-}
-
-void TextObject::drawTexture(GameObject* r) {
-    if (collideRect(*r)) {
-            offsetRect.x = rect.x - *r->getPosX();
-            offsetRect.y = rect.y - *r->getPosY();
-            offsetRect.w = rect.w;
-            offsetRect.h = rect.h;
-            SDL_RenderCopyEx(renderer, texture, &dRect, &offsetRect, angle, &pivot, flip);
-        }
-}
-
-void TextObject::draw() {
-    drawTexture();
-}
-
-void TextObject::draw(GameObject* r) {
-    drawTexture(r);
-}
-
 
 GameCamera::GameCamera(GameInfo* g, int w, int h) : SpriteObject(g) {
     rect.w = w;

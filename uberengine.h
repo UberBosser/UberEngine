@@ -22,55 +22,8 @@ struct GameInfo {
 bool collideRect(SDL_Rect* a, SDL_Rect* b);
 
 
-class GameObject {
-    // The Base of any object in the engine.
-    public:
-        bool operator== (const GameObject *gameObject) const; 
-
-        bool collideRect(GameObject gameObject);
-        
-        SDL_Rect* getRect();
-        int* getPosX();
-        int* getPosY();
-        int* getWidth();
-        int* getHeight();
-
-        // Input a vector to change position.
-        void changePosition(int x, int y);
-
-        SDL_Renderer* getRenderer();
-        b2World* getWorld();
-        
-        virtual void updates();
-        virtual void updatePhysics();
-        virtual void update();
-
-        virtual void draw();
-        virtual void draw(GameObject* r);
-
-        virtual ~GameObject();
-
-    protected:
-        SDL_Renderer *renderer;
-        SDL_Surface *surface;
-        SDL_Texture *texture; 
-
-        double angle;
-        SDL_Point pivot;
-        SDL_Rect rect;
-        SDL_Rect dRect;
-        b2Body *body;
-        b2BodyDef bodyDef;
-        SDL_Rect offsetRect;
-        SDL_RendererFlip flip;
-        
-        GameObject *parent;
-        b2World* world;
-};
-
-
 class SpriteObject {
-    // Dynamic physics object, has a mass, reacts to collisions.
+    // No physics, simple sprite.
     public:
         SpriteObject(GameInfo* g); 
        
@@ -172,31 +125,6 @@ class ContactListener : public b2ContactListener {
     
     // Call RigidBody's collisionEnd().
     void EndContact(b2Contact* contact);
-};
-
-
-class TextObject : public GameObject {
-    // Kind of like the SpriteObject, but instead it loads a font to draw text.
-    public:
-        TextObject(SDL_Renderer *r);
-        TextObject(GameObject *p);
-
-        void createSurface(int x, int y, const char *t, int s, const char *f);
-
-        void updateText(char *t);
-        void updateText(const char *t);
-
-        virtual void update();
-        void drawTexture();
-        void drawTexture(GameObject* r);
-        virtual void draw();
-        virtual void draw(GameObject* r);
-
-    private:
-        TTF_Font *font;
-        SDL_Color color;
-        char *text;
-
 };
 
 
