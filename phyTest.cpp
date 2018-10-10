@@ -1,6 +1,8 @@
 #include <iostream>
-#include "UE_core.h"
-#include "UE_utils.h"
+#include "UE/UE_core.h"
+#include "UE/UE_utils.h"
+#include "UE/UE_physics.h"
+#include "UE/UE_audio.h"
 
 
 class Floor : public StaticBody {
@@ -92,9 +94,9 @@ class Player : public DynamicBody {
 };
 
 
-class Game : public GameManager {
+class Game : public PhysicsGameManager {
     public:
-        Game() : GameManager("Physics Test", 512, 512, 0){
+        Game() : PhysicsGameManager("Physics Test", 512, 512, 0){
             camera = new GameCamera(getGameInfo(), 512, 512);
             music = new MusicManager("Assets/music.wav");
             // music->play();

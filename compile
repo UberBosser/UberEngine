@@ -1,6 +1,6 @@
 #! /bin/bash
 echo compiling...
-g++ $1 UE_core.cpp UE_utils.cpp \
+g++ $1 UE/*.cpp \
     -o game.o \
     -DDEBUG \
     -O0 \
