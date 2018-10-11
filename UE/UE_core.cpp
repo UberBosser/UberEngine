@@ -10,24 +10,24 @@
 
 bool collideRect(SDL_Rect* a, SDL_Rect* b) {
     if (a->y + a->h <= b->y) {
-            return false;
-        }
-        if (a->y >= b->y + b->h) {
-            return false; 
-        }
-        if (a->x + a->w <= b->x) {
-            return false;
-        }
-        if (a->x >= b->x + b->w) {
-            return false; 
-        }
-        return true;
+        return false;
+    }
+    if (a->y >= b->y + b->h) {
+        return false; 
+    }
+    if (a->x + a->w <= b->x) {
+        return false;
+    }
+    if (a->x >= b->x + b->w) {
+        return false; 
+    }
+    return true;
 }
 
 
 SpriteObject::SpriteObject(GameInfo* g) {
     gameInfo = g;
-    flip = SDL_FLIP_NONE;
+    flipped = SDL_FLIP_NONE;
     angle = 0;
 }
 
@@ -125,6 +125,10 @@ void SpriteObject::changeFrame(int i) {
     dRect = frames[i];
 }
 
+void SpriteObject::flip(SDL_RendererFlip f) {
+    flipped = f;
+}
+
 void SpriteObject::update() {}
 
 void SpriteObject::draw() {
@@ -133,7 +137,7 @@ void SpriteObject::draw() {
 
 void SpriteObject::drawTexture() {
     if (collideRect(&rect, &gameInfo->screenRect)) {
-        SDL_RenderCopyEx(gameInfo->renderer, texture, &dRect, &rect, angle, &pivot, flip);
+        SDL_RenderCopyEx(gameInfo->renderer, texture, &dRect, &rect, angle, &pivot, flipped);
     }
 }
 
@@ -148,7 +152,7 @@ void SpriteObject::drawTexture(SpriteObject* c) {
         offsetRect.y = rect.y - c->getPosY();
         offsetRect.w = rect.w;
         offsetRect.h = rect.h;
-        SDL_RenderCopyEx(gameInfo->renderer, texture, &dRect, &offsetRect, angle, &pivot, flip);
+        SDL_RenderCopyEx(gameInfo->renderer, texture, &dRect, &offsetRect, angle, &pivot, flipped);
     }
 }
 
@@ -166,8 +170,9 @@ GameManager::GameManager() {
     gameInfo.renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED);
     screen = SDL_GetWindowSurface(window);
     Mix_OpenAudio(44100, MIX_DEFAULT_FORMAT, 2, 1536);
-    gameInfo.screenRect.w = 1366;
-    gameInfo.screenRect.h = 768;
+    gameInfo.screenRect.x = 0;
+    gameInfo.screenRect.y = 0;
+    SDL_GetRendererOutputSize(gameInfo.renderer, &gameInfo.screenRect.w, &gameInfo.screenRect.h);
     SDL_SetWindowIcon(window, IMG_Load("Assets/icon.png"));
 }
 
@@ -180,6 +185,8 @@ GameManager::GameManager(const char* t, int w, int h, Uint32 f) {
     gameInfo.renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED);
     screen = SDL_GetWindowSurface(window);
     Mix_OpenAudio(44100, MIX_DEFAULT_FORMAT, 2, 1536);
+    gameInfo.screenRect.x = 0;
+    gameInfo.screenRect.y = 0;
     gameInfo.screenRect.w = w;
     gameInfo.screenRect.h = h;
     SDL_SetWindowIcon(window, IMG_Load("Assets/icon.png"));

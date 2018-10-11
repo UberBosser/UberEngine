@@ -6,12 +6,8 @@ RigidBody::RigidBody(GameInfo* g) : SpriteObject(g){
     b2BodyDef bodyDef;
     bodyDef.type = b2_staticBody;
     bodyDef.angle = 0.0f;
-    if (gameInfo->world != NULL) { 
-        body = gameInfo->world->CreateBody(&bodyDef);
-        body->SetUserData(this);
-    } else {
-        printf("trying to create body in non physics world");
-    }
+    body = gameInfo->world->CreateBody(&bodyDef);
+    body->SetUserData(this);
 }
 
 void RigidBody::collisionStart() {}

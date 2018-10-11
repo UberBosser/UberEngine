@@ -1,0 +1,6 @@
+#! /bin/bash
+echo "moving headers to /usr/local/include"
+sudo mkdir /usr/local/include/UE
+sudo rm /usr/local/include/UE/UE_*.h
+sudo cp UE/UE_*.h /usr/local/include/UE
+echo "done."

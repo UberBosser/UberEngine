@@ -18,3 +18,6 @@ The `SDL2, SDL2_image, SDL2_mixer and Box2D` libraries are required.
 ## TODO
 * **Tilemaps**
 * **More utilities**
+
+## Credit
+Cute dino sprite: [@ScissorMarks](https://twitter.com/ScissorMarks)

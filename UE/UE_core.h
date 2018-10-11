@@ -39,7 +39,10 @@ class SpriteObject {
         int getPosY();
 
         // Change frame of animation.
-        void changeFrame(int i);        
+        void changeFrame(int i);
+        
+        // Flip sprite.
+        void flip(SDL_RendererFlip f);
 
         virtual void update();
 
@@ -63,7 +66,7 @@ class SpriteObject {
         SDL_Surface* surface;
         SDL_Texture* texture;
         SDL_Point pivot;
-        SDL_RendererFlip flip;
+        SDL_RendererFlip flipped;
         SDL_Rect offsetRect;
 
         std::vector <SDL_Rect> frames;
