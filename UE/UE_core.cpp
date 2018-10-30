@@ -1,6 +1,7 @@
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_image.h>
 #include <SDL2/SDL_mixer.h>
+#include <SDL2/SDL_ttf.h>
 #include <Box2D/Box2D.h>
 #include <math.h>
 #include <iostream>
@@ -37,7 +38,7 @@ void SpriteObject::loadImage(int x, int y, const char* i) {
         printf("Couldn't load image: %s\n", IMG_GetError());
     }
     rect = surface->clip_rect;
-    dRect = surface->clip_rect;
+    dRect = rect;
     rect.x = x;
     rect.y = y;
     pivot.x = rect.w/2;
@@ -166,6 +167,7 @@ GameManager::GameManager() {
     SDL_Init(SDL_INIT_EVERYTHING);
     IMG_Init(IMG_INIT_PNG | IMG_INIT_JPG);
     Mix_Init(MIX_INIT_MP3);
+    TTF_Init();
     window = SDL_CreateWindow("UberEngine", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, 1366, 768, SDL_WINDOW_FULLSCREEN_DESKTOP);
     gameInfo.renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED);
     screen = SDL_GetWindowSurface(window);
@@ -181,6 +183,7 @@ GameManager::GameManager(const char* t, int w, int h, Uint32 f) {
     SDL_Init(SDL_INIT_EVERYTHING);
     IMG_Init(IMG_INIT_PNG | IMG_INIT_JPG); 
     Mix_Init(MIX_INIT_MP3);
+    TTF_Init();
     window = SDL_CreateWindow(t, SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, w, h, f);
     gameInfo.renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED);
     screen = SDL_GetWindowSurface(window);
@@ -246,6 +249,7 @@ void GameManager::loop() {
     SDL_DestroyWindow(window);
     Mix_Quit();
     IMG_Quit();
+    TTF_Quit();
     SDL_Quit();
 }
 

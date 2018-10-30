@@ -41,11 +41,16 @@ class DynamicBody : public RigidBody {
         void boxFixture();
         // Creates a circleFixture, using the loaded image size.
         void circleFixture();
+        
+        // Change Fixture parameters.
+        void setDensity(float d);
+        void setRestitution(float r);
+        void setFriction(float f);
 
         void setPosition(float x, float y);
         
         b2Vec2 getVelocity();
-        void setVelocity(int x, int y);
+        void setVelocity(float x, float y);
 
         virtual void update();
         void updatePhysics();

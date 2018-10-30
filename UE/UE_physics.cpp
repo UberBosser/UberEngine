@@ -82,11 +82,26 @@ void DynamicBody::circleFixture() {
     setPosition(rect.x * 0.01f, rect.y * 0.01f);
 }
 
+void DynamicBody::setDensity(float d) {
+    b2Fixture* fixture = body->GetFixtureList();
+    fixture->SetDensity(d);
+}
+
+void DynamicBody::setRestitution(float r) {
+    b2Fixture* fixture = body->GetFixtureList();
+    fixture->SetRestitution(r);
+}
+
+void DynamicBody::setFriction(float f) {
+    b2Fixture* fixture = body->GetFixtureList();
+    fixture->SetFriction(f);
+}
+
 void DynamicBody::setPosition(float x, float y) {
     body->SetTransform(b2Vec2(x + (dRect.w * 0.01f)/2.0f, y + (dRect.h * 0.01f)/2.0f), body->GetAngle());
 }
 
-void DynamicBody::setVelocity(int x, int y) {
+void DynamicBody::setVelocity(float x, float y) {
     // Fix int to box2d meters.
     body->SetLinearVelocity(b2Vec2(x, y));
 }
@@ -156,6 +171,7 @@ void PhysicsGameManager::loop() {
     SDL_DestroyWindow(window);
     Mix_Quit();
     IMG_Quit();
+    TTF_Quit();
     SDL_Quit();
 }
 

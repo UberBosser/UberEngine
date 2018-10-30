@@ -1,5 +1,6 @@
 #ifndef UE_UTILS_H
 #define UE_UTILS_H
+#include <SDL2/SDL_ttf.h>
 #include "UE_core.h"
 
 
@@ -77,5 +78,22 @@ class GameCamera : public SpriteObject {
         bool maxBounds;
         int maxW, maxH;
 };
+
+
+class FontObject : public SpriteObject {
+    // Easy font interface.
+    public:
+        FontObject(GameInfo* g);
+        FontObject(GameInfo* g, SDL_Color c);
+
+        void loadFont(int x, int y, std::string t, int s, const char* f);
+        void updateText(std::string t);
+
+    private:
+        TTF_Font* font;
+        SDL_Color color;
+        char* text;
+};
+
 
 #endif

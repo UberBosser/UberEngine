@@ -3,12 +3,15 @@
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_image.h>
 #include <SDL2/SDL_mixer.h>
+#include <SDL2/SDL_ttf.h>
 #include <Box2D/Box2D.h>
 #include <vector>
 
 
 #define DEGTORAD 0.0174532925199432957f
 #define RADTODEG 57.295779513082320876f
+
+#define GET_KEYS() SDL_GetKeyboardState(NULL)
 
 
 // Game information, passed down to pretty much everything.
@@ -62,10 +65,12 @@ class SpriteObject {
         SDL_Rect dRect;
         float angle;
 
-    private:
         SDL_Surface* surface;
         SDL_Texture* texture;
+
         SDL_Point pivot;
+
+    private: 
         SDL_RendererFlip flipped;
         SDL_Rect offsetRect;
 

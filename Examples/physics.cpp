@@ -58,7 +58,8 @@ class Player : public DynamicBody {
             collisions--;
         }
 
-        void update() { updatePhysics();
+        void update() { 
+            updatePhysics();
             const Uint8* keys = SDL_GetKeyboardState(NULL);
             if (keys[SDL_SCANCODE_A]) {
                 setVelocity(-1, 0);

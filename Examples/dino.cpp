@@ -12,6 +12,9 @@ class Player : public SpriteObject {
             speed = 3;
             idle = true;
             runningFrame = 4;
+
+            position = new FontObject(g, {255, 0, 0, 255});
+            position->loadFont(100, 100, "(0, 0)", 24, "Assets/PressStart2P.ttf");
         }
 
         void animation() {
@@ -61,7 +64,7 @@ class Player : public SpriteObject {
         }
 
         void update() {
-            const Uint8* keys = SDL_GetKeyboardState(NULL);
+            const Uint8* keys = GET_KEYS();
             idle = true;
             if (keys[SDL_SCANCODE_A]) {
                 rect.x += -speed;
@@ -88,6 +91,17 @@ class Player : public SpriteObject {
                 idle = false;
             }
             animation();
+            // c sprintf("(%d) ")
+            position->updateText("(" + std::to_string(rect.x) + ", " + std::to_string(rect.y) + ")");
+        }
+
+        void draw() {
+            drawTexture();
+            position->draw();
+        }
+
+        ~Player() {
+            delete position;
         }
 
     private:
@@ -98,6 +112,8 @@ class Player : public SpriteObject {
         int runningTime;
         int runningFrame;
         bool flipped;
+
+        FontObject* position;
 };
 
 
