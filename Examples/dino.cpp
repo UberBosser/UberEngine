@@ -66,7 +66,7 @@ class Player : public SpriteObject {
         void update() {
             const Uint8* keys = GET_KEYS();
             idle = true;
-            if (keys[SDL_SCANCODE_A]) {
+            if (keys[KEY_A]) {
                 rect.x += -speed;
                 idle = false;
                 if (flipped == true) {
@@ -74,7 +74,7 @@ class Player : public SpriteObject {
                     flipped = false;
                 }
             } 
-            if (keys[SDL_SCANCODE_D]) {
+            if (keys[KEY_D]) {
                 rect.x += speed;
                 idle = false;
                 if (flipped == false) {
@@ -82,16 +82,15 @@ class Player : public SpriteObject {
                     flipped = true;
                 }
             }
-            if (keys[SDL_SCANCODE_W]) {
+            if (keys[KEY_W]) {
                 rect.y += -speed;
                 idle = false;
             }
-            if (keys[SDL_SCANCODE_S]) {
+            if (keys[KEY_S]) {
                 rect.y += speed;
                 idle = false;
             }
             animation();
-            // c sprintf("(%d) ")
             position->updateText("(" + std::to_string(rect.x) + ", " + std::to_string(rect.y) + ")");
         }
 

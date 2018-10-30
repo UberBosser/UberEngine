@@ -60,19 +60,19 @@ class Player : public DynamicBody {
 
         void update() { 
             updatePhysics();
-            const Uint8* keys = SDL_GetKeyboardState(NULL);
-            if (keys[SDL_SCANCODE_A]) {
+            const Uint8* keys = GET_KEYS();
+            if (keys[KEY_A]) {
                 setVelocity(-1, 0);
             }
-            if (keys[SDL_SCANCODE_D]) {
+            if (keys[KEY_D]) {
                 setVelocity(1, 0);
             }
-            if (keys[SDL_SCANCODE_W] && canJump) {
+            if (keys[KEY_W] && canJump) {
                 jumpSound->play();
                 setVelocity(0, -5);
                 canJump = false;
             }     
-            if (keys[SDL_SCANCODE_R]) {
+            if (keys[KEY_R]) {
                 setPosition(0, 0);
                 setVelocity(0, 0);
             }
