@@ -6,7 +6,7 @@
 class Player : public SpriteObject {
     public:
         Player(GameInfo* g) : SpriteObject(g) {
-            loadImage(0, 0, 48, 48, "Assets/Dinos/dinoSheet.png");
+            loadImage(0, 0, 48, 48, "Assets/Dinos/dinoSheet.png", 2);
             rect.x = 0;
             rect.y = 0;
             speed = 3;

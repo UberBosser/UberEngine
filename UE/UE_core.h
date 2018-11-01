@@ -30,9 +30,10 @@ class SpriteObject {
     public:
         SpriteObject(GameInfo* g); 
        
-        void loadImage(int x, int y, const char* i);
+        void loadImage(int x, int y, const char* i, double s = 1);
         // SpriteSheet...
-        void loadImage(int x, int y, int w, int h, const char* i);
+        void loadImage(int x, int y, int w, int h, const char* i, double s = 1);
+
         
         // If image is loaded this way don't forget to call SDL_FreeSurface(surface);.
         void loadImage(int x, int y, SDL_Surface* i);

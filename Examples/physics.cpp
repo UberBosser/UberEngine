@@ -17,7 +17,7 @@ class Floor : public StaticBody {
 class Box : public DynamicBody {
     public:
         Box(GameInfo* g, GameObjects <Box>* b, SoundManager* s, int x, int y) : DynamicBody(g) {
-            loadImage(x, y, "Assets/smallBox.png");
+            loadImage(x, y, "Assets/smallBox.png", 1.5);
             deathSound = s;
 
             boxes = b;
@@ -42,7 +42,7 @@ class Box : public DynamicBody {
 class Player : public DynamicBody {
     public:
         Player(GameInfo* g) : DynamicBody(g) {
-            loadImage(0, 0, 32, 32, "Assets/circlePlayer.png");
+            loadImage(0, 0, 32, 32, "Assets/circlePlayer.png", 2);
             jumpSound = new SoundManager("Assets/jump.wav");
             circleFixture();
             collisions = 0;

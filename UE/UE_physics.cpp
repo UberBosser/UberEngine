@@ -25,7 +25,7 @@ StaticBody::StaticBody(GameInfo* g) : RigidBody(g) {
 
 void StaticBody::boxFixture() {
     b2PolygonShape boxShape;
-    boxShape.SetAsBox((dRect.w * 0.01f)/2.0f - 0.01f, (dRect.h * 0.01f)/2.0f - 0.01f);
+    boxShape.SetAsBox((rect.w * 0.01f)/2.0f - 0.01f, (rect.h * 0.01f)/2.0f - 0.01f);
     b2FixtureDef boxFixtureDef;
     boxFixtureDef.shape = &boxShape;
 
@@ -36,7 +36,7 @@ void StaticBody::boxFixture() {
 
 void StaticBody::circleFixture() {
     b2CircleShape circleShape;
-    circleShape.m_radius = (dRect.w/2 + dRect.h/2)/2 * 0.01;
+    circleShape.m_radius = (rect.w/2 + rect.h/2)/2 * 0.01;
 
     b2FixtureDef circleFixtureDef;
     circleFixtureDef.shape = &circleShape;
@@ -47,7 +47,7 @@ void StaticBody::circleFixture() {
 }
 
 void StaticBody::setPosition(float x, float y) {
-    body->SetTransform(b2Vec2(x + (dRect.w * 0.01f)/2.0f, y + (dRect.h * 0.01f)/2.0f), body->GetAngle());
+    body->SetTransform(b2Vec2(x + (rect.w * 0.01f)/2.0f, y + (rect.h * 0.01f)/2.0f), body->GetAngle());
 }
 
 
@@ -57,7 +57,7 @@ DynamicBody::DynamicBody(GameInfo* g) : RigidBody(g){
 
 void DynamicBody::boxFixture() {
     b2PolygonShape boxShape;
-    boxShape.SetAsBox((dRect.w * 0.01f)/2.0f - 0.01f, (dRect.h * 0.01f)/2.0f - 0.01f);
+    boxShape.SetAsBox((rect.w * 0.01f)/2.0f - 0.01f, (rect.h * 0.01f)/2.0f - 0.01f);
     b2FixtureDef boxFixtureDef;
     boxFixtureDef.shape = &boxShape;
     boxFixtureDef.density = 1;
@@ -70,7 +70,7 @@ void DynamicBody::boxFixture() {
 
 void DynamicBody::circleFixture() {
     b2CircleShape circleShape;
-    circleShape.m_radius = (dRect.w/2 + dRect.h/2)/2 * 0.01;
+    circleShape.m_radius = (rect.w/2 + rect.h/2)/2 * 0.01;
 
     b2FixtureDef circleFixtureDef;
     circleFixtureDef.shape = &circleShape;
@@ -98,7 +98,7 @@ void DynamicBody::setFriction(float f) {
 }
 
 void DynamicBody::setPosition(float x, float y) {
-    body->SetTransform(b2Vec2(x + (dRect.w * 0.01f)/2.0f, y + (dRect.h * 0.01f)/2.0f), body->GetAngle());
+    body->SetTransform(b2Vec2(x + (rect.w * 0.01f)/2.0f, y + (rect.h * 0.01f)/2.0f), body->GetAngle());
 }
 
 void DynamicBody::setVelocity(float x, float y) {
@@ -112,8 +112,8 @@ void DynamicBody::update() {
 
 void DynamicBody::updatePhysics() {
     b2Vec2 pos = body->GetPosition();
-    rect.x = (pos.x - (dRect.w * 0.01f)/2.0f) * 100;
-    rect.y = (pos.y - (dRect.h * 0.01f)/2.0f) * 100;
+    rect.x = (pos.x - (rect.w * 0.01f)/2.0f) * 100;
+    rect.y = (pos.y - (rect.h * 0.01f)/2.0f) * 100;
     angle = body->GetAngle() * RADTODEG;
 }
 

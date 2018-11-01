@@ -32,42 +32,44 @@ SpriteObject::SpriteObject(GameInfo* g) {
     angle = 0;
 }
 
-void SpriteObject::loadImage(int x, int y, const char* i) {
+void SpriteObject::loadImage(int x, int y, const char* i, double s) {
     surface = IMG_Load(i);
     if (!surface) {
         printf("Couldn't load image: %s\n", IMG_GetError());
     }
     rect = surface->clip_rect;
-    dRect = rect;
+    rect.w = rect.w * s;
+    rect.h = rect.h * s;
+    dRect = rect; 
     rect.x = x;
     rect.y = y;
     pivot.x = rect.w/2;
     pivot.y = rect.h/2; 
-    SDL_SetHint( SDL_HINT_RENDER_SCALE_QUALITY, "1");
+//    SDL_SetHint( SDL_HINT_RENDER_SCALE_QUALITY, "1");
     texture = SDL_CreateTextureFromSurface(gameInfo->renderer, surface);
     SDL_FreeSurface(surface);
 }
 
-void SpriteObject::loadImage(int x, int y, int w, int h, const char* i) {
+void SpriteObject::loadImage(int x, int y, int w, int h, const char* i, double s) {
     surface = IMG_Load(i);
     if (!surface) {
         printf("Couldn't load image: %s\n", IMG_GetError());
     }
     rect = surface->clip_rect;
-    for (int y = 0; y < rect.h/h; y++) {
-        for (int x = 0; x < rect.w/w; x++) {
-            SDL_Rect r = {x * w, y * h, w, h};
+    for (int yy = 0; yy < rect.h/h; yy++) {
+        for (int xx = 0; xx < rect.w/w; xx++) {
+            SDL_Rect r = {xx * w, yy * h, w, h};
             frames.push_back(r);
         }
     }
     dRect = frames[0];
-    rect.w = w;
-    rect.h = h;
+    rect.h = h * s;
+    rect.w = w * s;
     rect.x = x;
     rect.y = y;
-    pivot.x = dRect.w/2;
-    pivot.y = dRect.h/2;
-    SDL_SetHint( SDL_HINT_RENDER_SCALE_QUALITY, "1");
+    pivot.x = rect.w/2;
+    pivot.y = rect.h/2;
+//    SDL_SetHint( SDL_HINT_RENDER_SCALE_QUALITY, "1");
     texture = SDL_CreateTextureFromSurface(gameInfo->renderer, surface);
     SDL_FreeSurface(surface);
 }
